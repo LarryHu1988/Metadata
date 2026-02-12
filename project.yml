@@ -1,0 +1,38 @@
+name: MetadataOrganizerApp
+options:
+  deploymentTarget:
+    macOS: "13.0"
+settings:
+  base:
+    PRODUCT_BUNDLE_IDENTIFIER: com.larry.metadataorganizer
+    SWIFT_VERSION: 5.10
+targets:
+  MetadataOrganizerApp:
+    type: application
+    platform: macOS
+    sources:
+      - Sources/MetadataOrganizerApp
+    settings:
+      base:
+        PRODUCT_NAME: MetadataOrganizerApp
+        INFOPLIST_KEY_CFBundleDisplayName: MetadataOrganizerApp
+        INFOPLIST_KEY_LSMinimumSystemVersion: "13.0"
+        CODE_SIGN_STYLE: Automatic
+    info:
+      path: Sources/MetadataOrganizerApp/Info.plist
+      properties:
+        CFBundleName: MetadataOrganizerApp
+        CFBundleDisplayName: MetadataOrganizerApp
+        CFBundleShortVersionString: 0.1.0
+        CFBundleVersion: 0.1.0
+        NSHighResolutionCapable: true
+        NSPrincipalClass: NSApplication
+schemes:
+  MetadataOrganizerApp:
+    build:
+      targets:
+        MetadataOrganizerApp: all
+    run:
+      config: Debug
+    archive:
+      config: Release

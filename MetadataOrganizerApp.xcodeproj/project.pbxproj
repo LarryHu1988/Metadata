@@ -1,0 +1,316 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		007BCC20DD6D1CD49A379A48 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C35E61959BAEC38DD811EF /* MainView.swift */; };
+		3D5F5C45DD64372423794067 /* RenameOrganizerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B498CFBC008F2AF068645BE /* RenameOrganizerService.swift */; };
+		70A99CFC8E1E504F03FCFE5C /* MetadataOrganizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA4D8FBD95CDAA630EBA373 /* MetadataOrganizerApp.swift */; };
+		C760B02BE92E8DCB2A19EEB8 /* FileScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE91036E739308D20F7F2CA8 /* FileScanner.swift */; };
+		DCD6C88880F67DCFFC5A449E /* MetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7ED861BE1519CDB348E1C4 /* MetadataService.swift */; };
+		E8ACB582AFB19F2F12AF4E38 /* RuleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2806849A9CB9A2FB2D26130D /* RuleEngine.swift */; };
+		FFFCA5FD8D87462C6BA4784A /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0838147B385BC67EEA19AF1B /* Models.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0838147B385BC67EEA19AF1B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		1C746E5FFB14C5531537A2AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2806849A9CB9A2FB2D26130D /* RuleEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleEngine.swift; sourceTree = "<group>"; };
+		29C35E61959BAEC38DD811EF /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		4A8A0EB06CC4CC1875992407 /* MetadataOrganizerApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetadataOrganizerApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B498CFBC008F2AF068645BE /* RenameOrganizerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameOrganizerService.swift; sourceTree = "<group>"; };
+		CE91036E739308D20F7F2CA8 /* FileScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileScanner.swift; sourceTree = "<group>"; };
+		CEA4D8FBD95CDAA630EBA373 /* MetadataOrganizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataOrganizerApp.swift; sourceTree = "<group>"; };
+		EE7ED861BE1519CDB348E1C4 /* MetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataService.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		B2E058922839636FB4E95FEC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4A8A0EB06CC4CC1875992407 /* MetadataOrganizerApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D33483C42E575BC49955148E /* MetadataOrganizerApp */ = {
+			isa = PBXGroup;
+			children = (
+				CE91036E739308D20F7F2CA8 /* FileScanner.swift */,
+				1C746E5FFB14C5531537A2AC /* Info.plist */,
+				29C35E61959BAEC38DD811EF /* MainView.swift */,
+				CEA4D8FBD95CDAA630EBA373 /* MetadataOrganizerApp.swift */,
+				EE7ED861BE1519CDB348E1C4 /* MetadataService.swift */,
+				0838147B385BC67EEA19AF1B /* Models.swift */,
+				9B498CFBC008F2AF068645BE /* RenameOrganizerService.swift */,
+				2806849A9CB9A2FB2D26130D /* RuleEngine.swift */,
+			);
+			name = MetadataOrganizerApp;
+			path = Sources/MetadataOrganizerApp;
+			sourceTree = "<group>";
+		};
+		F30BA2E9B3AC384C9F2D61C3 = {
+			isa = PBXGroup;
+			children = (
+				D33483C42E575BC49955148E /* MetadataOrganizerApp */,
+				B2E058922839636FB4E95FEC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A0378943740010CBB7DE4D98 /* MetadataOrganizerApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7FB26AEBC7DD89CBD3D0302F /* Build configuration list for PBXNativeTarget "MetadataOrganizerApp" */;
+			buildPhases = (
+				9F45AB4A84895C948A3722B6 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MetadataOrganizerApp;
+			packageProductDependencies = (
+			);
+			productName = MetadataOrganizerApp;
+			productReference = 4A8A0EB06CC4CC1875992407 /* MetadataOrganizerApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		113712FFDC8B30815857BE58 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					A0378943740010CBB7DE4D98 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 1A4084A7A8A9669A08CAAA41 /* Build configuration list for PBXProject "MetadataOrganizerApp" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F30BA2E9B3AC384C9F2D61C3;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A0378943740010CBB7DE4D98 /* MetadataOrganizerApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9F45AB4A84895C948A3722B6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C760B02BE92E8DCB2A19EEB8 /* FileScanner.swift in Sources */,
+				007BCC20DD6D1CD49A379A48 /* MainView.swift in Sources */,
+				70A99CFC8E1E504F03FCFE5C /* MetadataOrganizerApp.swift in Sources */,
+				DCD6C88880F67DCFFC5A449E /* MetadataService.swift in Sources */,
+				FFFCA5FD8D87462C6BA4784A /* Models.swift in Sources */,
+				3D5F5C45DD64372423794067 /* RenameOrganizerService.swift in Sources */,
+				E8ACB582AFB19F2F12AF4E38 /* RuleEngine.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		178442C67889869D12668953 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Sources/MetadataOrganizerApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MetadataOrganizerApp;
+				INFOPLIST_KEY_LSMinimumSystemVersion = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_NAME = MetadataOrganizerApp;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		29A16877574E47689FAFC147 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.larry.metadataorganizer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.1;
+			};
+			name = Debug;
+		};
+		8AB60CEC991A26FCD3B1BF2F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.larry.metadataorganizer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.1;
+			};
+			name = Release;
+		};
+		988E5CA0317C86FD885E2B7B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Sources/MetadataOrganizerApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MetadataOrganizerApp;
+				INFOPLIST_KEY_LSMinimumSystemVersion = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_NAME = MetadataOrganizerApp;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1A4084A7A8A9669A08CAAA41 /* Build configuration list for PBXProject "MetadataOrganizerApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				29A16877574E47689FAFC147 /* Debug */,
+				8AB60CEC991A26FCD3B1BF2F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7FB26AEBC7DD89CBD3D0302F /* Build configuration list for PBXNativeTarget "MetadataOrganizerApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				178442C67889869D12668953 /* Debug */,
+				988E5CA0317C86FD885E2B7B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 113712FFDC8B30815857BE58 /* Project object */;
+}
