@@ -96,13 +96,12 @@ struct PDFWorkItem: Identifiable, Hashable {
 }
 
 struct MetadataSourceOptions: Hashable {
-    var useOpenLibrary: Bool = true
     var useGoogleBooks: Bool = true
-    var useLoCValidation: Bool = true
-    var useWorldCatValidation: Bool = true
-    var worldCatAPIKey: String = ""
-    var worldCatAPISecret: String = ""
-    var worldCatScope: String = "wcapi"
+    var useOpenLibrary: Bool = true
+    var useDoubanWebSearch: Bool = true
+    var useLibraryOfCongress: Bool = true
+    var useSemanticScholar: Bool = true
+    var semanticScholarAPIKey: String = ""
 }
 
 enum AppError: LocalizedError {

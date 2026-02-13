@@ -6,27 +6,26 @@
 
 1. 选择单个 PDF 或文件夹（递归扫描 PDF）
 2. 根据文件名与 PDF 内容提示联网检索元数据
-3. 确认后写入元数据
+3. 确认后写入 Dublin Core 元数据
 4. 再询问是否按规则重命名
 
-## 数据源链路（按顺序）
+## 数据源方案
 
-- ISBN -> Open Library（主）
-- Google Books（补充）
-- LoC / WorldCat（校验）
+- Open Library API
+- Google Books API
+- 豆瓣网页搜索
+- Library of Congress API
+- Semantic Scholar API（可选 API Key）
 
-## WorldCat 官方 API
+系统会并行查询多源结果，并按以下规则处理：
 
-程序已直接接入 OCLC WorldCat 官方 API：
-- Token：`https://oauth.oclc.org/token`
-- 检索：`https://americas.discovery.api.oclc.org/worldcat/search/v2/brief-bibs`
+- 去重键：`ISBN -> DOI -> 标题+作者`
+- 字段合并：标题、作者、出版社、出版年、语言、标识符取最优非空值
+- 来源合并：候选卡片显示合并后的来源列表与置信度
 
-在界面里填写：
-- `WorldCat API Key`
-- `WorldCat API Secret`
-- `Scope`（默认 `wcapi`）
+说明：
 
-如果未填写 Key/Secret，会自动跳过 WorldCat 官方校验并写入日志。
+- Semantic Scholar 未填写 API Key 时会以匿名方式调用，可能遇到 `HTTP 429` 限流。
 
 ## 命名规则
 
@@ -37,6 +36,35 @@
 示例：
 
 `Clean_Code_Robert_C_Martin_Prentice_Hall_2008_en.pdf`
+
+## 元数据标准
+
+写入采用 Dublin Core 字段（以 `dc:` 前缀保存）：
+
+- `dc:title`
+- `dc:creator`
+- `dc:publisher`
+- `dc:date`
+- `dc:language`
+- `dc:type`
+- `dc:format`
+- `dc:identifier`
+- `dc:source`
+- `dc:subject`
+- `dc:relation`
+- `dc:description`
+
+字段可在界面中勾选，默认选中：
+
+- `dc:title`
+- `dc:creator`
+- `dc:publisher`
+- `dc:date`
+- `dc:language`
+- `dc:type`
+- `dc:format`
+- `dc:identifier`
+- `dc:subject`
 
 ## 运行
 

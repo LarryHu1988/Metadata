@@ -67,9 +67,9 @@ struct MainView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Label("PDF 书籍/文献元数据助手", systemImage: "books.vertical.fill")
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
-                    Text("按 4 步流程处理：选择 PDF -> 联网检索 -> 确认写入 -> 标准重命名")
-                        .font(.system(size: 15, weight: .medium, design: .rounded))
+                        .font(.custom("Avenir Next", size: 31).weight(.bold))
+                    Text("按 4 步流程处理：选择 PDF -> 联网检索与字段合并 -> 确认写入 -> 标准重命名")
+                        .font(.custom("Avenir Next", size: 16).weight(.medium))
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -94,8 +94,8 @@ struct MainView: View {
                 CardTitle("流程步骤")
                 HStack(spacing: 8) {
                     StepPill(index: 1, title: "选择 PDF", activeStep: viewModel.currentStep)
-                    StepPill(index: 2, title: "联网检索元数据", activeStep: viewModel.currentStep)
-                    StepPill(index: 3, title: "确认写入元数据", activeStep: viewModel.currentStep)
+                    StepPill(index: 2, title: "联网检索+字段合并", activeStep: viewModel.currentStep)
+                    StepPill(index: 3, title: "确认写入 Dublin Core", activeStep: viewModel.currentStep)
                     StepPill(index: 4, title: "询问并重命名", activeStep: viewModel.currentStep)
                 }
             }
@@ -116,7 +116,7 @@ struct MainView: View {
                 }
 
                 Text("如果选择的是文件夹，程序会递归扫描其中所有 PDF。")
-                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .font(.custom("Avenir Next", size: 13))
                     .foregroundStyle(.secondary)
             }
         }
@@ -166,37 +166,39 @@ struct MainView: View {
                                     .lineLimit(2)
                             }
                         }
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .font(.custom("Avenir Next", size: 13).weight(.medium))
                         .foregroundStyle(.secondary)
 
                         Spacer()
 
                         VStack(alignment: .leading, spacing: 6) {
-                            Toggle("Open Library（主）", isOn: $viewModel.sourceOptions.useOpenLibrary)
+                            Toggle("Open Library", isOn: $viewModel.sourceOptions.useOpenLibrary)
                                 .toggleStyle(.switch)
-                            Toggle("Google Books（补充）", isOn: $viewModel.sourceOptions.useGoogleBooks)
+                            Toggle("Google Books", isOn: $viewModel.sourceOptions.useGoogleBooks)
                                 .toggleStyle(.switch)
-                            Toggle("LoC（校验）", isOn: $viewModel.sourceOptions.useLoCValidation)
+                            Toggle("豆瓣网页搜索", isOn: $viewModel.sourceOptions.useDoubanWebSearch)
                                 .toggleStyle(.switch)
-                            Toggle("WorldCat（校验）", isOn: $viewModel.sourceOptions.useWorldCatValidation)
+                            Toggle("Library of Congress", isOn: $viewModel.sourceOptions.useLibraryOfCongress)
+                                .toggleStyle(.switch)
+                            Toggle("Semantic Scholar", isOn: $viewModel.sourceOptions.useSemanticScholar)
                                 .toggleStyle(.switch)
 
-                            if viewModel.sourceOptions.useWorldCatValidation {
-                                FieldBlock(title: "WorldCat API Key", placeholder: "请输入 OCLC API Key", text: $viewModel.sourceOptions.worldCatAPIKey)
-                                    .frame(width: 320)
-                                SecureFieldBlock(title: "WorldCat API Secret", placeholder: "请输入 OCLC API Secret", text: $viewModel.sourceOptions.worldCatAPISecret)
-                                    .frame(width: 320)
-                                FieldBlock(title: "Scope", placeholder: "wcapi", text: $viewModel.sourceOptions.worldCatScope)
+                            if viewModel.sourceOptions.useSemanticScholar {
+                                FieldBlock(
+                                    title: "Semantic Scholar API Key（可选）",
+                                    placeholder: "留空则走匿名限流",
+                                    text: $viewModel.sourceOptions.semanticScholarAPIKey
+                                )
                                     .frame(width: 320)
 
-                                if !viewModel.hasWorldCatCredentials {
-                                    Text("未填写 API Key/Secret 时会跳过 WorldCat 官方校验。")
-                                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                                if !viewModel.hasSemanticScholarAPIKey {
+                                    Text("未填写 API Key 时可能触发 429 限流。")
+                                        .font(.custom("Avenir Next", size: 12).weight(.medium))
                                         .foregroundStyle(.orange)
                                 }
                             }
                         }
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .font(.custom("Avenir Next", size: 14).weight(.semibold))
                     }
 
                     HStack(spacing: 8) {
@@ -206,14 +208,37 @@ struct MainView: View {
                         .buttonStyle(PrimaryButton())
                         .disabled(viewModel.isSearching)
 
-                        Text("执行顺序：ISBN -> Open Library -> Google Books -> LoC/WorldCat 校验")
-                            .font(.system(size: 12, weight: .regular, design: .rounded))
+                        Text("执行策略：多源并行 -> ISBN/DOI/标题作者去重 -> 字段合并 -> 置信度排序")
+                            .font(.custom("Avenir Next", size: 12))
+                            .foregroundStyle(.secondary)
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Dublin Core 写入字段（可选择）")
+                            .font(.custom("Avenir Next", size: 14).weight(.semibold))
+                            .foregroundStyle(Color(red: 0.11, green: 0.15, blue: 0.35))
+
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 190), spacing: 8)], spacing: 6) {
+                            ForEach(DublinCoreField.allCases, id: \.self) { field in
+                                Toggle(isOn: Binding(
+                                    get: { viewModel.selectedDublinCoreFields.contains(field) },
+                                    set: { viewModel.setDublinCoreField(field, enabled: $0) }
+                                )) {
+                                    Text(field.rawValue)
+                                        .font(.custom("Avenir Next", size: 13).weight(.medium))
+                                }
+                                .toggleStyle(.checkbox)
+                            }
+                        }
+
+                        Text("已选 \(viewModel.selectedDublinCoreFields.count) 个字段")
+                            .font(.custom("Avenir Next", size: 12))
                             .foregroundStyle(.secondary)
                     }
 
                     if item.candidates.isEmpty {
                         Text("还没有候选元数据，请先执行联网搜索。")
-                            .font(.system(size: 12, weight: .regular, design: .rounded))
+                            .font(.custom("Avenir Next", size: 13))
                             .foregroundStyle(.secondary)
                     } else {
                         VStack(alignment: .leading, spacing: 7) {
@@ -229,14 +254,14 @@ struct MainView: View {
                         }
 
                         HStack(spacing: 8) {
-                            Button("3) 确认写入元数据") {
+                            Button("3) 确认写入 Dublin Core 元数据") {
                                 viewModel.askWriteConfirmationForSelectedItem()
                             }
                             .buttonStyle(PrimaryButton())
                             .disabled(item.selectedCandidateID == nil)
 
-                            Text("写入前会弹窗确认。")
-                                .font(.system(size: 12, weight: .regular, design: .rounded))
+                            Text("写入前会弹窗确认，并显示 Dublin Core 字段映射。")
+                                .font(.custom("Avenir Next", size: 13))
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -255,10 +280,10 @@ struct MainView: View {
 
                 if let prompt = viewModel.renamePrompt {
                     Text("建议命名：\(prompt.suggestedFileName)")
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .font(.custom("Avenir Next", size: 14).weight(.semibold))
 
                     Text("规则：书名_作者_出版社_出版年_语言.pdf")
-                        .font(.system(size: 12, weight: .regular, design: .rounded))
+                        .font(.custom("Avenir Next", size: 13))
                         .foregroundStyle(.secondary)
 
                     HStack(spacing: 8) {
@@ -285,7 +310,7 @@ struct MainView: View {
             VStack(alignment: .leading, spacing: 8) {
                 CardTitle("执行日志")
                 Text(viewModel.status)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.custom("Avenir Next", size: 13).weight(.semibold))
                     .foregroundStyle(Color(red: 0.11, green: 0.15, blue: 0.35))
 
                 if viewModel.logs.isEmpty {
@@ -295,7 +320,7 @@ struct MainView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         ForEach(Array(viewModel.logs.suffix(120).enumerated()), id: \.offset) { _, line in
                             Text(line)
-                                .font(.system(size: 11, weight: .regular, design: .monospaced))
+                                .font(.custom("Menlo", size: 12))
                                 .foregroundStyle(Color.white.opacity(0.9))
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
@@ -321,24 +346,24 @@ struct PDFItemRow: View {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .foregroundStyle(isSelected ? Color.blue : Color.gray)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.custom("Avenir Next", size: 16).weight(.semibold))
                     .padding(.top, 2)
 
                 VStack(alignment: .leading, spacing: 5) {
                     HStack {
                         Text(item.url.lastPathComponent)
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .font(.custom("Avenir Next", size: 15).weight(.semibold))
                         Spacer()
                         StageBadge(stage: item.stage)
                     }
 
                     Text(item.url.path)
-                        .font(.system(size: 12, weight: .regular, design: .monospaced))
+                        .font(.custom("Menlo", size: 12))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
 
                     Text("内容提示：\(item.hint.extractedTitle)")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .font(.custom("Avenir Next", size: 13).weight(.medium))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
@@ -346,11 +371,11 @@ struct PDFItemRow: View {
             .padding(10)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(isSelected ? Color.white.opacity(0.90) : Color.white.opacity(0.72))
+                    .fill(isSelected ? Color.white.opacity(0.95) : Color.white.opacity(0.82))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(isSelected ? Color.blue.opacity(0.44) : Color.white.opacity(0.64), lineWidth: 1)
+                    .stroke(isSelected ? Color.blue.opacity(0.55) : Color.white.opacity(0.72), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -372,20 +397,20 @@ struct CandidateRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Text(candidate.primaryTitle)
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .font(.custom("Avenir Next", size: 15).weight(.bold))
                             .foregroundStyle(Color(red: 0.10, green: 0.13, blue: 0.27))
                         Spacer()
                         Text("\(candidate.confidence)%")
-                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .font(.custom("Avenir Next", size: 12).weight(.bold))
                             .foregroundStyle(Color(red: 0.22, green: 0.28, blue: 0.73))
                     }
 
                     Text("\(candidate.kind.displayName) | \(candidate.authorsText)")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .font(.custom("Avenir Next", size: 13).weight(.medium))
                         .foregroundStyle(.secondary)
 
                     Text("\(candidate.publisher) \(candidate.publishedYear)")
-                        .font(.system(size: 12, weight: .regular, design: .rounded))
+                        .font(.custom("Avenir Next", size: 13))
                         .foregroundStyle(.secondary)
 
                     HStack(spacing: 6) {
@@ -405,11 +430,11 @@ struct CandidateRow: View {
             .padding(10)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(selected ? Color.white.opacity(0.92) : Color.white.opacity(0.74))
+                    .fill(selected ? Color.white.opacity(0.96) : Color.white.opacity(0.84))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(selected ? Color.blue.opacity(0.44) : Color.white.opacity(0.64), lineWidth: 1)
+                    .stroke(selected ? Color.blue.opacity(0.55) : Color.white.opacity(0.72), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -426,7 +451,7 @@ struct StepPill: View {
 
         HStack(spacing: 6) {
             Text("\(index)")
-                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .font(.custom("Avenir Next", size: 12).weight(.bold))
                 .frame(width: 18, height: 18)
                 .background(
                     Circle().fill(active ? Color.white : Color.white.opacity(0.6))
@@ -434,7 +459,7 @@ struct StepPill: View {
                 .foregroundStyle(active ? Color.blue : Color.gray)
 
             Text(title)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .font(.custom("Avenir Next", size: 13).weight(.semibold))
                 .lineLimit(1)
         }
         .padding(.horizontal, 10)
@@ -450,7 +475,7 @@ struct StageBadge: View {
 
     var body: some View {
         Text(stage.displayName)
-            .font(.system(size: 10, weight: .bold, design: .rounded))
+            .font(.custom("Avenir Next", size: 11).weight(.bold))
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
             .background(
@@ -482,11 +507,11 @@ struct MiniChip: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .font(.custom("Avenir Next", size: 12).weight(.semibold))
             .padding(.horizontal, 7)
             .padding(.vertical, 3)
-            .background(Capsule().fill(Color(red: 0.28, green: 0.31, blue: 0.90).opacity(0.14)))
-            .foregroundStyle(Color(red: 0.18, green: 0.22, blue: 0.56))
+            .background(Capsule().fill(Color(red: 0.11, green: 0.42, blue: 0.78).opacity(0.16)))
+            .foregroundStyle(Color(red: 0.06, green: 0.27, blue: 0.56))
             .lineLimit(1)
     }
 }
@@ -501,13 +526,13 @@ struct GlassCard<Content: View>: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Color.white.opacity(0.94))
+                .fill(Color.white.opacity(0.97))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(Color.white.opacity(0.52), lineWidth: 1)
+                .stroke(Color(red: 0.78, green: 0.84, blue: 0.95).opacity(0.7), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.16), radius: 18, x: 0, y: 10)
+        .shadow(color: Color.black.opacity(0.13), radius: 16, x: 0, y: 9)
     }
 }
 
@@ -520,7 +545,7 @@ struct CardTitle: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 18, weight: .bold, design: .rounded))
+            .font(.custom("Avenir Next", size: 19).weight(.bold))
             .foregroundStyle(Color(red: 0.10, green: 0.12, blue: 0.26))
     }
 }
@@ -532,10 +557,10 @@ struct CountChip: View {
     var body: some View {
         HStack(spacing: 6) {
             Text(title)
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .font(.custom("Avenir Next", size: 11).weight(.semibold))
                 .foregroundStyle(.secondary)
             Text(value)
-                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .font(.custom("Avenir Next", size: 13).weight(.bold))
                 .foregroundStyle(Color(red: 0.23, green: 0.27, blue: 0.71))
         }
         .padding(.horizontal, 9)
@@ -552,21 +577,21 @@ struct FieldBlock: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .font(.custom("Avenir Next", size: 13).weight(.semibold))
                 .foregroundStyle(.secondary)
 
             TextField(placeholder, text: $text)
                 .textFieldStyle(.plain)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
-                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .font(.custom("Avenir Next", size: 14).weight(.medium))
                 .background(
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(Color.white.opacity(0.92))
+                    .fill(Color.white.opacity(0.98))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .stroke(Color(red: 0.74, green: 0.76, blue: 0.90).opacity(0.70), lineWidth: 1)
+                        .stroke(Color(red: 0.69, green: 0.75, blue: 0.89).opacity(0.75), lineWidth: 1)
                 )
         }
     }
@@ -580,21 +605,21 @@ struct SecureFieldBlock: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .font(.custom("Avenir Next", size: 13).weight(.semibold))
                 .foregroundStyle(.secondary)
 
             SecureField(placeholder, text: $text)
                 .textFieldStyle(.plain)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
-                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .font(.custom("Avenir Next", size: 14).weight(.medium))
                 .background(
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .fill(Color.white.opacity(0.92))
+                        .fill(Color.white.opacity(0.98))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .stroke(Color(red: 0.74, green: 0.76, blue: 0.90).opacity(0.70), lineWidth: 1)
+                        .stroke(Color(red: 0.69, green: 0.75, blue: 0.89).opacity(0.75), lineWidth: 1)
                 )
         }
     }
@@ -603,15 +628,15 @@ struct SecureFieldBlock: View {
 struct PrimaryButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 13, weight: .bold, design: .rounded))
+            .font(.custom("Avenir Next", size: 14).weight(.bold))
             .foregroundStyle(.white)
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
             .background(
                 LinearGradient(
                     colors: [
-                        Color(red: 0.27, green: 0.32, blue: 0.94),
-                        Color(red: 0.44, green: 0.29, blue: 0.93)
+                        Color(red: 0.09, green: 0.43, blue: 0.86),
+                        Color(red: 0.16, green: 0.59, blue: 0.86)
                     ],
                     startPoint: .leading,
                     endPoint: .trailing
@@ -625,7 +650,7 @@ struct PrimaryButton: ButtonStyle {
 struct SecondaryButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 12, weight: .bold, design: .rounded))
+            .font(.custom("Avenir Next", size: 13).weight(.bold))
             .foregroundStyle(Color(red: 0.20, green: 0.25, blue: 0.62))
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
@@ -640,6 +665,35 @@ struct SecondaryButton: ButtonStyle {
     }
 }
 
+enum DublinCoreField: String, CaseIterable, Hashable {
+    case title = "dc:title"
+    case creator = "dc:creator"
+    case publisher = "dc:publisher"
+    case date = "dc:date"
+    case language = "dc:language"
+    case type = "dc:type"
+    case format = "dc:format"
+    case identifier = "dc:identifier"
+    case subject = "dc:subject"
+    case source = "dc:source"
+    case relation = "dc:relation"
+    case description = "dc:description"
+
+    static var defaultSelected: [DublinCoreField] {
+        [
+            .title,
+            .creator,
+            .publisher,
+            .date,
+            .language,
+            .type,
+            .format,
+            .identifier,
+            .subject
+        ]
+    }
+}
+
 struct RenamePromptState {
     let itemID: UUID
     let suggestedFileName: String
@@ -651,6 +705,7 @@ final class MainViewModel: ObservableObject {
     @Published var items: [PDFWorkItem] = []
     @Published var selectedItemID: UUID?
     @Published var sourceOptions = MetadataSourceOptions()
+    @Published var selectedDublinCoreFields: Set<DublinCoreField> = Set(DublinCoreField.defaultSelected)
 
     @Published var status: String = "准备就绪"
     @Published var logs: [String] = []
@@ -681,10 +736,9 @@ final class MainViewModel: ObservableObject {
         selectedItem?.stage.displayName ?? "未开始"
     }
 
-    var hasWorldCatCredentials: Bool {
-        let key = sourceOptions.worldCatAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
-        let secret = sourceOptions.worldCatAPISecret.trimmingCharacters(in: .whitespacesAndNewlines)
-        return !key.isEmpty && !secret.isEmpty
+    var hasSemanticScholarAPIKey: Bool {
+        let key = sourceOptions.semanticScholarAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !key.isEmpty
     }
 
     var currentStep: Int {
@@ -746,8 +800,8 @@ final class MainViewModel: ObservableObject {
         status = "正在联网检索: \(item.url.lastPathComponent)"
         appendLog(status)
 
-        if sourceOptions.useWorldCatValidation, !hasWorldCatCredentials {
-            appendLog("未配置 WorldCat API Key/Secret，已跳过 WorldCat 官方 API 校验。")
+        if sourceOptions.useSemanticScholar, !hasSemanticScholarAPIKey {
+            appendLog("未配置 Semantic Scholar API Key，匿名调用可能遇到限流（HTTP 429）。")
         }
 
         let itemID = item.id
@@ -782,6 +836,14 @@ final class MainViewModel: ObservableObject {
         items[index].selectedCandidateID = candidateID
     }
 
+    func setDublinCoreField(_ field: DublinCoreField, enabled: Bool) {
+        if enabled {
+            selectedDublinCoreFields.insert(field)
+        } else {
+            selectedDublinCoreFields.remove(field)
+        }
+    }
+
     func askWriteConfirmationForSelectedItem() {
         guard let item = selectedItem,
               let candidate = selectedCandidate(for: item)
@@ -790,8 +852,20 @@ final class MainViewModel: ObservableObject {
             return
         }
 
+        guard !selectedDublinCoreFields.isEmpty else {
+            status = "请至少选择一个 Dublin Core 写入字段"
+            appendLog(status)
+            return
+        }
+
+        let entries = dublinCoreEntries(for: candidate, fileURL: item.url)
+        let preview = entries
+            .sorted(by: { $0.key < $1.key })
+            .map { "\($0.key): \($0.value)" }
+            .joined(separator: "\n")
+
         pendingWriteItemID = item.id
-        pendingWriteSummary = "将写入：\n标题: \(candidate.primaryTitle)\n作者: \(candidate.authorsText)\n出版社: \(candidate.publisher)\n出版年: \(candidate.publishedYear)\n语言: \(candidate.language)\n来源: \(candidate.source)\n校验: \(candidate.validatedBy.joined(separator: "/"))\n\n确认继续？"
+        pendingWriteSummary = "将按 Dublin Core 写入以下字段：\n\(preview)\n\n确认继续？"
         showWriteConfirmation = true
     }
 
@@ -812,25 +886,18 @@ final class MainViewModel: ObservableObject {
 
         let url = items[index].url
 
-        let entries: [String: String] = [
-            "book.kind": candidate.kind.rawValue,
-            "book.title": candidate.title,
-            "book.subtitle": candidate.subtitle,
-            "book.authors": candidate.authorsText,
-            "book.publisher": candidate.publisher,
-            "book.publishedYear": candidate.publishedYear,
-            "book.language": candidate.language,
-            "book.isbn": candidate.isbn,
-            "book.doi": candidate.doi,
-            "book.source": candidate.source,
-            "book.sourceURL": candidate.sourceURL,
-            "book.validation": candidate.validatedBy.joined(separator: ",")
-        ]
+        guard !selectedDublinCoreFields.isEmpty else {
+            status = "写入失败: 没有选中任何 Dublin Core 字段"
+            appendLog(status)
+            return
+        }
+
+        let entries = dublinCoreEntries(for: candidate, fileURL: url)
 
         do {
             try metadataService.writeMetadata(fileURL: url, entries: entries)
             items[index].stage = .written
-            status = "元数据写入成功: \(url.lastPathComponent)"
+            status = "Dublin Core 元数据写入成功: \(url.lastPathComponent)"
             appendLog(status)
 
             let suggested = renameService.suggestedFileName(for: candidate, originalExtension: url.pathExtension)
@@ -890,6 +957,42 @@ final class MainViewModel: ObservableObject {
     private func selectedCandidate(for item: PDFWorkItem) -> BookMetadataCandidate? {
         guard let id = item.selectedCandidateID else { return nil }
         return item.candidates.first(where: { $0.id == id })
+    }
+
+    private func dublinCoreEntries(for candidate: BookMetadataCandidate, fileURL: URL) -> [String: String] {
+        let dcIdentifier: String = {
+            if !candidate.isbn.isEmpty { return "isbn:\(candidate.isbn)" }
+            if !candidate.doi.isEmpty { return "doi:\(candidate.doi)" }
+            if !candidate.sourceURL.isEmpty { return candidate.sourceURL }
+            return fileURL.lastPathComponent
+        }()
+
+        let typeSubject = candidate.kind == .paper ? "academic paper" : "book"
+        let validationSummary = candidate.validatedBy.isEmpty ? "" : candidate.validatedBy.joined(separator: ", ")
+        let description = [candidate.subtitle, validationSummary]
+            .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            .joined(separator: " | validation: ")
+
+        let all: [DublinCoreField: String] = [
+            .title: candidate.title,
+            .creator: candidate.authorsText,
+            .publisher: candidate.publisher,
+            .date: candidate.publishedYear,
+            .language: candidate.language,
+            .type: "Text",
+            .format: "application/pdf",
+            .identifier: dcIdentifier,
+            .source: candidate.source,
+            .subject: typeSubject,
+            .relation: candidate.sourceURL,
+            .description: description
+        ]
+
+        var entries: [String: String] = [:]
+        for field in DublinCoreField.allCases where selectedDublinCoreFields.contains(field) {
+            entries[field.rawValue] = all[field] ?? ""
+        }
+        return entries
     }
 
     private func appendLog(_ line: String) {
