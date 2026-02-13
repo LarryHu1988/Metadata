@@ -180,23 +180,6 @@ struct MainView: View {
                                 .toggleStyle(.switch)
                             Toggle("Library of Congress", isOn: $viewModel.sourceOptions.useLibraryOfCongress)
                                 .toggleStyle(.switch)
-                            Toggle("Semantic Scholar", isOn: $viewModel.sourceOptions.useSemanticScholar)
-                                .toggleStyle(.switch)
-
-                            if viewModel.sourceOptions.useSemanticScholar {
-                                FieldBlock(
-                                    title: "Semantic Scholar API Key（可选）",
-                                    placeholder: "留空则走匿名限流",
-                                    text: $viewModel.sourceOptions.semanticScholarAPIKey
-                                )
-                                    .frame(width: 320)
-
-                                if !viewModel.hasSemanticScholarAPIKey {
-                                    Text("未填写 API Key 时可能触发 429 限流。")
-                                        .font(.custom("Avenir Next", size: 12).weight(.medium))
-                                        .foregroundStyle(.orange)
-                                }
-                            }
                         }
                         .font(.custom("Avenir Next", size: 14).weight(.semibold))
                     }
@@ -284,6 +267,10 @@ struct MainView: View {
 
                     Text("规则：书名_作者_出版社_出版年_语言.pdf")
                         .font(.custom("Avenir Next", size: 13))
+                        .foregroundStyle(.secondary)
+
+                    Text("字段内空格会替换为 .，字段之间仍使用 _ 分隔。")
+                        .font(.custom("Avenir Next", size: 12))
                         .foregroundStyle(.secondary)
 
                     HStack(spacing: 8) {
@@ -736,11 +723,6 @@ final class MainViewModel: ObservableObject {
         selectedItem?.stage.displayName ?? "未开始"
     }
 
-    var hasSemanticScholarAPIKey: Bool {
-        let key = sourceOptions.semanticScholarAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
-        return !key.isEmpty
-    }
-
     var currentStep: Int {
         guard let item = selectedItem else { return 1 }
         switch item.stage {
@@ -799,10 +781,6 @@ final class MainViewModel: ObservableObject {
         isSearching = true
         status = "正在联网检索: \(item.url.lastPathComponent)"
         appendLog(status)
-
-        if sourceOptions.useSemanticScholar, !hasSemanticScholarAPIKey {
-            appendLog("未配置 Semantic Scholar API Key，匿名调用可能遇到限流（HTTP 429）。")
-        }
 
         let itemID = item.id
         let hint = item.hint

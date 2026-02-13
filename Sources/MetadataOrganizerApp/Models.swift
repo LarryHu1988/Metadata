@@ -100,8 +100,6 @@ struct MetadataSourceOptions: Hashable {
     var useOpenLibrary: Bool = true
     var useDoubanWebSearch: Bool = true
     var useLibraryOfCongress: Bool = true
-    var useSemanticScholar: Bool = true
-    var semanticScholarAPIKey: String = ""
 }
 
 enum AppError: LocalizedError {

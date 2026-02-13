@@ -35,13 +35,6 @@ final class BookMetadataFetcher {
                 }
             }
 
-            if options.useSemanticScholar {
-                let apiKey = options.semanticScholarAPIKey
-                group.addTask { [self] in
-                    await fetchFromSemanticScholar(hint: hint, apiKey: apiKey)
-                }
-            }
-
             for await batch in group {
                 pool.append(contentsOf: batch)
             }
@@ -281,79 +274,6 @@ final class BookMetadataFetcher {
                         sourceURL: sourceURL,
                         validatedBy: ["LoC"],
                         confidence: 48
-                    )
-                )
-            }
-        }
-
-        return results
-    }
-
-    private func fetchFromSemanticScholar(hint: PDFSearchHint, apiKey: String) async -> [BookMetadataCandidate] {
-        var results: [BookMetadataCandidate] = []
-        var queries: [String] = []
-
-        if let doi = hint.doi, !normalizeDOI(doi).isEmpty {
-            queries.append(normalizeDOI(doi))
-        }
-
-        queries.append(contentsOf: buildQueryStrings(from: hint, includeISBNToken: false, maxQueries: 2))
-
-        for query in uniquePreservingOrder(queries) where !query.isEmpty {
-            guard var comps = URLComponents(string: "https://api.semanticscholar.org/graph/v1/paper/search") else { continue }
-            comps.queryItems = [
-                URLQueryItem(name: "query", value: query),
-                URLQueryItem(name: "limit", value: "8"),
-                URLQueryItem(
-                    name: "fields",
-                    value: "title,authors,year,venue,externalIds,url,publicationTypes"
-                )
-            ]
-
-            guard let url = comps.url else { continue }
-
-            var headers: [String: String] = [:]
-            let cleanKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !cleanKey.isEmpty {
-                headers["x-api-key"] = cleanKey
-            }
-
-            guard let data = try? await requestData(url: url, headers: headers),
-                  let payload = try? JSONDecoder().decode(SemanticScholarSearchResponse.self, from: data)
-            else {
-                continue
-            }
-
-            for paper in payload.data ?? [] {
-                let title = cleanText(paper.title)
-                guard !title.isEmpty else { continue }
-
-                let authors = sanitizeAuthors((paper.authors ?? []).compactMap { cleanText($0.name) })
-                let year = paper.year.map(String.init) ?? ""
-                let doi = normalizeDOI(paper.externalIds?["DOI"] ?? paper.externalIds?["doi"] ?? "")
-                let isbn = normalizeISBN(
-                    paper.externalIds?["ISBN"]
-                        ?? paper.externalIds?["isbn"]
-                        ?? ""
-                )
-                let publicationTypes = paper.publicationTypes ?? []
-                let isBook = publicationTypes.contains(where: { $0.lowercased().contains("book") })
-
-                results.append(
-                    BookMetadataCandidate(
-                        kind: isBook ? .book : .paper,
-                        title: title,
-                        subtitle: "",
-                        authors: authors,
-                        publisher: cleanText(paper.venue),
-                        publishedYear: year,
-                        language: "",
-                        isbn: isbn,
-                        doi: doi,
-                        source: "Semantic Scholar",
-                        sourceURL: cleanText(paper.url),
-                        validatedBy: ["Semantic Scholar"],
-                        confidence: isBook ? 44 : 39
                     )
                 )
             }
@@ -999,22 +919,4 @@ private struct OpenLibraryDoc: Decodable {
         case language
         case key
     }
-}
-
-private struct SemanticScholarSearchResponse: Decodable {
-    let data: [SemanticScholarPaper]?
-}
-
-private struct SemanticScholarPaper: Decodable {
-    let title: String?
-    let authors: [SemanticScholarAuthor]?
-    let year: Int?
-    let venue: String?
-    let externalIds: [String: String]?
-    let url: String?
-    let publicationTypes: [String]?
-}
-
-private struct SemanticScholarAuthor: Decodable {
-    let name: String?
 }

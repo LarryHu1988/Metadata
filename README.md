@@ -15,7 +15,6 @@
 - Google Books API
 - 豆瓣网页搜索
 - Library of Congress API
-- Semantic Scholar API（可选 API Key）
 
 系统会并行查询多源结果，并按以下规则处理：
 
@@ -23,9 +22,7 @@
 - 字段合并：标题、作者、出版社、出版年、语言、标识符取最优非空值
 - 来源合并：候选卡片显示合并后的来源列表与置信度
 
-说明：
-
-- Semantic Scholar 未填写 API Key 时会以匿名方式调用，可能遇到 `HTTP 429` 限流。
+说明：系统仅使用以上四个数据源。
 
 ## 命名规则
 
@@ -33,9 +30,14 @@
 
 `书名_作者_出版社_出版年_语言.pdf`
 
+字段规则：
+
+- 字段之间使用 `_` 分隔
+- 每个字段内部若有空格，替换为 `.`
+
 示例：
 
-`Clean_Code_Robert_C_Martin_Prentice_Hall_2008_en.pdf`
+`Clean.Code_Robert.C.Martin_Prentice.Hall_2008_en.pdf`
 
 ## 元数据标准
 

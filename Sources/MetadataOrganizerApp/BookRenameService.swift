@@ -4,15 +4,15 @@ struct BookRenameService {
     private let fileManager = FileManager.default
 
     func suggestedFileName(for candidate: BookMetadataCandidate, originalExtension: String = "pdf") -> String {
-        let title = sanitize(tokenOrFallback(candidate.title, fallback: "UnknownTitle"))
-        let author = sanitize(tokenOrFallback(shortAuthorText(from: candidate.authors), fallback: "UnknownAuthor"))
-        let publisher = sanitize(tokenOrFallback(candidate.publisher, fallback: "UnknownPublisher"))
-        let year = sanitize(tokenOrFallback(candidate.publishedYear, fallback: "UnknownYear"))
-        let language = sanitize(tokenOrFallback(candidate.language, fallback: "unknown"))
+        let title = sanitizeFieldToken(tokenOrFallback(candidate.title, fallback: "UnknownTitle"))
+        let author = sanitizeFieldToken(tokenOrFallback(shortAuthorText(from: candidate.authors), fallback: "UnknownAuthor"))
+        let publisher = sanitizeFieldToken(tokenOrFallback(candidate.publisher, fallback: "UnknownPublisher"))
+        let year = sanitizeFieldToken(tokenOrFallback(candidate.publishedYear, fallback: "UnknownYear"))
+        let language = sanitizeFieldToken(tokenOrFallback(candidate.language, fallback: "unknown"))
 
         let base = [title, author, publisher, year, language].joined(separator: "_")
         let ext = originalExtension.isEmpty ? "pdf" : originalExtension
-        return "\(sanitize(base)).\(ext)"
+        return "\(sanitizeFileName(base)).\(ext)"
     }
 
     func renameFile(at fileURL: URL, using candidate: BookMetadataCandidate) throws -> URL {
@@ -37,10 +37,10 @@ struct BookRenameService {
         }
 
         if cleanAuthors.count > 1 {
-            return sanitize(first)
+            return first
         }
 
-        return sanitize(first)
+        return first
     }
 
     private func uniqueURL(in directory: URL, fileName: String) -> URL {
@@ -68,13 +68,26 @@ struct BookRenameService {
         }
     }
 
-    private func sanitize(_ raw: String) -> String {
+    private func sanitizeFieldToken(_ raw: String) -> String {
         let invalid = CharacterSet(charactersIn: "/:\\?%*|\"<>")
-        let converted = raw.unicodeScalars.map { invalid.contains($0) ? Character("_") : Character($0) }
+        let converted = raw.unicodeScalars.map { invalid.contains($0) ? Character(".") : Character($0) }
+
         return String(converted)
-            .replacingOccurrences(of: "\\s+", with: "_", options: .regularExpression)
+            .replacingOccurrences(of: "_", with: ".")
+            .replacingOccurrences(of: "\\s+", with: ".", options: .regularExpression)
+            .replacingOccurrences(of: "\\.+", with: ".", options: .regularExpression)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "._ ").union(.whitespacesAndNewlines))
+    }
+
+    private func sanitizeFileName(_ raw: String) -> String {
+        let invalid = CharacterSet(charactersIn: "/:\\?%*|\"<>")
+        let converted = raw.unicodeScalars.map { invalid.contains($0) ? Character(".") : Character($0) }
+
+        return String(converted)
+            .replacingOccurrences(of: "\\s+", with: ".", options: .regularExpression)
+            .replacingOccurrences(of: "\\.+", with: ".", options: .regularExpression)
             .replacingOccurrences(of: "_+", with: "_", options: .regularExpression)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "._ ").union(.whitespacesAndNewlines))
     }
 
     private func tokenOrFallback(_ raw: String, fallback: String) -> String {
