@@ -1,6 +1,17 @@
 import SwiftUI
 import AppKit
 
+private enum SurgePalette {
+    static let canvasTop = Color(red: 0.03, green: 0.08, blue: 0.16)
+    static let canvasBottom = Color(red: 0.02, green: 0.13, blue: 0.24)
+    static let flowA = Color(red: 0.11, green: 0.41, blue: 0.74)
+    static let flowB = Color(red: 0.16, green: 0.64, blue: 0.88)
+    static let flowC = Color(red: 0.06, green: 0.29, blue: 0.56)
+    static let textPrimary = Color.white.opacity(0.95)
+    static let textSecondary = Color.white.opacity(0.72)
+    static let cardStroke = Color.white.opacity(0.28)
+}
+
 struct MainView: View {
     @StateObject private var viewModel = MainViewModel()
 
@@ -9,19 +20,19 @@ struct MainView: View {
             background
 
             ScrollView {
-                VStack(spacing: 14) {
+                VStack(spacing: 16) {
                     headerCard
                     stepCard
-                    sourceCard
-                    pdfListCard
-                    metadataSearchCard
-                    renameCard
-                    logCard
+                    stepOneCard
+                    stepTwoCard
+                    stepThreeCard
+                    stepFourCard
                 }
-                .frame(maxWidth: 1160)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 20)
+                .frame(maxWidth: 1180)
+                .padding(.horizontal, 28)
+                .padding(.vertical, 24)
             }
+            .scrollIndicators(.hidden)
         }
         .alert("确认写入元数据？", isPresented: $viewModel.showWriteConfirmation) {
             Button("取消", role: .cancel) {
@@ -39,26 +50,53 @@ struct MainView: View {
         ZStack {
             LinearGradient(
                 colors: [
-                    Color(red: 0.11, green: 0.17, blue: 0.42),
-                    Color(red: 0.14, green: 0.22, blue: 0.52),
-                    Color(red: 0.10, green: 0.27, blue: 0.49)
+                    SurgePalette.canvasTop,
+                    SurgePalette.canvasBottom
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
 
-            Circle()
-                .fill(Color.white.opacity(0.10))
-                .frame(width: 500, height: 500)
-                .blur(radius: 30)
-                .offset(x: -420, y: -300)
+            RadialGradient(
+                colors: [SurgePalette.flowA.opacity(0.55), .clear],
+                center: .topTrailing,
+                startRadius: 20,
+                endRadius: 680
+            )
+            .ignoresSafeArea()
 
-            Circle()
-                .fill(Color.white.opacity(0.07))
-                .frame(width: 420, height: 420)
-                .blur(radius: 36)
-                .offset(x: 420, y: 300)
+            RadialGradient(
+                colors: [SurgePalette.flowB.opacity(0.42), .clear],
+                center: .bottomLeading,
+                startRadius: 40,
+                endRadius: 720
+            )
+            .ignoresSafeArea()
+
+            RoundedRectangle(cornerRadius: 280, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [SurgePalette.flowA.opacity(0.42), SurgePalette.flowC.opacity(0.18)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 860, height: 430)
+                .blur(radius: 120)
+                .offset(x: -330, y: -300)
+
+            RoundedRectangle(cornerRadius: 260, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [SurgePalette.flowB.opacity(0.38), SurgePalette.flowC.opacity(0.14)],
+                        startPoint: .topTrailing,
+                        endPoint: .bottomLeading
+                    )
+                )
+                .frame(width: 760, height: 420)
+                .blur(radius: 115)
+                .offset(x: 360, y: 280)
         }
     }
 
@@ -67,10 +105,11 @@ struct MainView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Label("PDF 书籍/文献元数据助手", systemImage: "books.vertical.fill")
-                        .font(.custom("Avenir Next", size: 31).weight(.bold))
+                        .font(.custom("Songti SC", size: 31).weight(.bold))
+                        .foregroundStyle(SurgePalette.textPrimary)
                     Text("按 4 步流程处理：选择 PDF -> 联网检索与字段合并 -> 确认写入 -> 标准重命名")
-                        .font(.custom("Avenir Next", size: 16).weight(.medium))
-                        .foregroundStyle(.secondary)
+                        .font(.custom("Songti SC", size: 16).weight(.medium))
+                        .foregroundStyle(SurgePalette.textSecondary)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 6) {
@@ -92,44 +131,48 @@ struct MainView: View {
         GlassCard {
             VStack(alignment: .leading, spacing: 10) {
                 CardTitle("流程步骤")
-                HStack(spacing: 8) {
+                HStack(spacing: 10) {
                     StepPill(index: 1, title: "选择 PDF", activeStep: viewModel.currentStep)
+                        .frame(maxWidth: .infinity, minHeight: 64, maxHeight: 64)
                     StepPill(index: 2, title: "联网检索+字段合并", activeStep: viewModel.currentStep)
+                        .frame(maxWidth: .infinity, minHeight: 64, maxHeight: 64)
                     StepPill(index: 3, title: "确认写入 Dublin Core", activeStep: viewModel.currentStep)
+                        .frame(maxWidth: .infinity, minHeight: 64, maxHeight: 64)
                     StepPill(index: 4, title: "询问并重命名", activeStep: viewModel.currentStep)
+                        .frame(maxWidth: .infinity, minHeight: 64, maxHeight: 64)
                 }
+                .frame(maxWidth: .infinity)
             }
         }
     }
 
-    private var sourceCard: some View {
+    private var stepOneCard: some View {
         GlassCard {
-            VStack(alignment: .leading, spacing: 10) {
-                CardTitle("1) 选择文件或文件夹（仅处理 PDF）")
+            VStack(alignment: .leading, spacing: 12) {
+                CardTitle("1) 选择 PDF")
 
                 HStack(spacing: 10) {
                     FieldBlock(title: "已选路径", placeholder: "请选择 PDF 文件或文件夹", text: $viewModel.sourcePath)
+                        .frame(maxWidth: .infinity)
                     Button("选择") { viewModel.pickSource() }
                         .buttonStyle(SecondaryButton())
+                        .frame(width: 100)
                     Button("加载 PDF") { viewModel.loadPDFsFromSource() }
                         .buttonStyle(PrimaryButton())
+                        .frame(width: 100)
                 }
 
                 Text("如果选择的是文件夹，程序会递归扫描其中所有 PDF。")
-                    .font(.custom("Avenir Next", size: 13))
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
+                    .font(.custom("Songti SC", size: 13))
+                    .foregroundStyle(SurgePalette.textSecondary)
 
-    private var pdfListCard: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: 10) {
-                CardTitle("已加载 PDF 列表")
+                Text("已加载 PDF 列表")
+                    .font(.custom("Songti SC", size: 14).weight(.semibold))
+                    .foregroundStyle(SurgePalette.textPrimary)
 
                 if viewModel.items.isEmpty {
                     Text("尚未加载 PDF")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(SurgePalette.textSecondary)
                 } else {
                     LazyVStack(spacing: 8) {
                         ForEach(viewModel.items) { item in
@@ -145,10 +188,10 @@ struct MainView: View {
         }
     }
 
-    private var metadataSearchCard: some View {
+    private var stepTwoCard: some View {
         GlassCard {
-            VStack(alignment: .leading, spacing: 10) {
-                CardTitle("2) 根据文件名或内容联网搜索元数据")
+            VStack(alignment: .leading, spacing: 12) {
+                CardTitle("2) 联网检索+字段合并")
 
                 if let item = viewModel.selectedItem {
                     HStack(alignment: .top, spacing: 10) {
@@ -166,10 +209,18 @@ struct MainView: View {
                                     .lineLimit(2)
                             }
                         }
-                        .font(.custom("Avenir Next", size: 13).weight(.medium))
-                        .foregroundStyle(.secondary)
-
-                        Spacer()
+                        .font(.custom("Songti SC", size: 13).weight(.medium))
+                        .foregroundStyle(SurgePalette.textSecondary)
+                        .frame(maxWidth: .infinity, minHeight: 126, alignment: .topLeading)
+                        .padding(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(Color.white.opacity(0.08))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                        )
 
                         VStack(alignment: .leading, spacing: 6) {
                             Toggle("Open Library", isOn: $viewModel.sourceOptions.useOpenLibrary)
@@ -181,7 +232,17 @@ struct MainView: View {
                             Toggle("Library of Congress", isOn: $viewModel.sourceOptions.useLibraryOfCongress)
                                 .toggleStyle(.switch)
                         }
-                        .font(.custom("Avenir Next", size: 14).weight(.semibold))
+                        .font(.custom("Songti SC", size: 14).weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 126, alignment: .topLeading)
+                        .padding(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(Color.white.opacity(0.08))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                        )
                     }
 
                     HStack(spacing: 8) {
@@ -192,14 +253,58 @@ struct MainView: View {
                         .disabled(viewModel.isSearching)
 
                         Text("执行策略：多源并行 -> ISBN/DOI/标题作者去重 -> 字段合并 -> 置信度排序")
-                            .font(.custom("Avenir Next", size: 12))
-                            .foregroundStyle(.secondary)
+                            .font(.custom("Songti SC", size: 12))
+                            .foregroundStyle(SurgePalette.textSecondary)
+                    }
+
+                    if item.candidates.isEmpty {
+                        Text("还没有候选元数据，请先执行联网搜索。")
+                            .font(.custom("Songti SC", size: 13))
+                            .foregroundStyle(SurgePalette.textSecondary)
+                    } else {
+                        VStack(alignment: .leading, spacing: 7) {
+                            ForEach(item.candidates) { candidate in
+                                CandidateRow(
+                                    candidate: candidate,
+                                    selected: item.selectedCandidateID == candidate.id,
+                                    onTap: { viewModel.chooseCandidate(candidate.id, for: item.id) }
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    Text("请先在第 1 步加载并选择一个 PDF。")
+                        .foregroundStyle(SurgePalette.textSecondary)
+                }
+            }
+        }
+    }
+
+    private var stepThreeCard: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                CardTitle("3) 确认写入 Dublin Core")
+
+                if let item = viewModel.selectedItem {
+                    VStack(alignment: .leading, spacing: 6) {
+                        if let candidate = item.candidates.first(where: { $0.id == item.selectedCandidateID }) {
+                            Text("当前选中候选：\(candidate.primaryTitle)")
+                                .font(.custom("Songti SC", size: 14).weight(.semibold))
+                                .foregroundStyle(SurgePalette.textPrimary)
+                            Text("来源：\(candidate.source) | 置信度：\(candidate.confidence)%")
+                                .font(.custom("Songti SC", size: 12))
+                                .foregroundStyle(SurgePalette.textSecondary)
+                        } else {
+                            Text("尚未选中候选元数据。请先完成第 2 步搜索并选择候选。")
+                                .font(.custom("Songti SC", size: 13))
+                                .foregroundStyle(SurgePalette.textSecondary)
+                        }
                     }
 
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Dublin Core 写入字段（可选择）")
-                            .font(.custom("Avenir Next", size: 14).weight(.semibold))
-                            .foregroundStyle(Color(red: 0.11, green: 0.15, blue: 0.35))
+                            .font(.custom("Songti SC", size: 14).weight(.semibold))
+                            .foregroundStyle(SurgePalette.textPrimary)
 
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 190), spacing: 8)], spacing: 6) {
                             ForEach(DublinCoreField.allCases, id: \.self) { field in
@@ -208,70 +313,52 @@ struct MainView: View {
                                     set: { viewModel.setDublinCoreField(field, enabled: $0) }
                                 )) {
                                     Text(field.rawValue)
-                                        .font(.custom("Avenir Next", size: 13).weight(.medium))
+                                        .font(.custom("Songti SC", size: 13).weight(.medium))
                                 }
                                 .toggleStyle(.checkbox)
                             }
                         }
 
                         Text("已选 \(viewModel.selectedDublinCoreFields.count) 个字段")
-                            .font(.custom("Avenir Next", size: 12))
-                            .foregroundStyle(.secondary)
+                            .font(.custom("Songti SC", size: 12))
+                            .foregroundStyle(SurgePalette.textSecondary)
                     }
 
-                    if item.candidates.isEmpty {
-                        Text("还没有候选元数据，请先执行联网搜索。")
-                            .font(.custom("Avenir Next", size: 13))
-                            .foregroundStyle(.secondary)
-                    } else {
-                        VStack(alignment: .leading, spacing: 7) {
-                            ForEach(item.candidates) { candidate in
-                                CandidateRow(
-                                    candidate: candidate,
-                                    selected: item.selectedCandidateID == candidate.id,
-                                    onTap: {
-                                        viewModel.chooseCandidate(candidate.id, for: item.id)
-                                    }
-                                )
-                            }
+                    HStack(spacing: 8) {
+                        Button("确认写入 Dublin Core 元数据") {
+                            viewModel.askWriteConfirmationForSelectedItem()
                         }
+                        .buttonStyle(PrimaryButton())
+                        .disabled(item.selectedCandidateID == nil)
 
-                        HStack(spacing: 8) {
-                            Button("3) 确认写入 Dublin Core 元数据") {
-                                viewModel.askWriteConfirmationForSelectedItem()
-                            }
-                            .buttonStyle(PrimaryButton())
-                            .disabled(item.selectedCandidateID == nil)
-
-                            Text("写入前会弹窗确认，并显示 Dublin Core 字段映射。")
-                                .font(.custom("Avenir Next", size: 13))
-                                .foregroundStyle(.secondary)
-                        }
+                        Text("写入前会弹窗确认，并显示 Dublin Core 字段映射。")
+                            .font(.custom("Songti SC", size: 13))
+                            .foregroundStyle(SurgePalette.textSecondary)
                     }
                 } else {
-                    Text("请先在上方列表中选择一个 PDF。")
-                        .foregroundStyle(.secondary)
+                    Text("请先在第 1 步加载并选择一个 PDF。")
+                        .foregroundStyle(SurgePalette.textSecondary)
                 }
             }
         }
     }
 
-    private var renameCard: some View {
+    private var stepFourCard: some View {
         GlassCard {
-            VStack(alignment: .leading, spacing: 10) {
-                CardTitle("4) 写入后询问是否按标准规则重命名")
+            VStack(alignment: .leading, spacing: 12) {
+                CardTitle("4) 询问并重命名")
 
                 if let prompt = viewModel.renamePrompt {
                     Text("建议命名：\(prompt.suggestedFileName)")
-                        .font(.custom("Avenir Next", size: 14).weight(.semibold))
+                        .font(.custom("Songti SC", size: 14).weight(.semibold))
 
                     Text("规则：书名_作者_出版社_出版年_语言.pdf")
-                        .font(.custom("Avenir Next", size: 13))
-                        .foregroundStyle(.secondary)
+                        .font(.custom("Songti SC", size: 13))
+                        .foregroundStyle(SurgePalette.textSecondary)
 
                     Text("字段内空格会替换为 .，字段之间仍使用 _ 分隔。")
-                        .font(.custom("Avenir Next", size: 12))
-                        .foregroundStyle(.secondary)
+                        .font(.custom("Songti SC", size: 12))
+                        .foregroundStyle(SurgePalette.textSecondary)
 
                     HStack(spacing: 8) {
                         Button("按标准规则重命名") {
@@ -286,23 +373,22 @@ struct MainView: View {
                     }
                 } else {
                     Text("当前没有待确认重命名的文件。")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(SurgePalette.textSecondary)
                 }
-            }
-        }
-    }
 
-    private var logCard: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: 8) {
-                CardTitle("执行日志")
+                Divider()
+                    .overlay(Color.white.opacity(0.2))
+
+                Text("执行日志")
+                    .font(.custom("Songti SC", size: 14).weight(.semibold))
+                    .foregroundStyle(SurgePalette.textPrimary)
                 Text(viewModel.status)
-                    .font(.custom("Avenir Next", size: 13).weight(.semibold))
-                    .foregroundStyle(Color(red: 0.11, green: 0.15, blue: 0.35))
+                    .font(.custom("Songti SC", size: 13).weight(.semibold))
+                    .foregroundStyle(SurgePalette.textPrimary)
 
                 if viewModel.logs.isEmpty {
                     Text("暂无日志")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(SurgePalette.textSecondary)
                 } else {
                     VStack(alignment: .leading, spacing: 4) {
                         ForEach(Array(viewModel.logs.suffix(120).enumerated()), id: \.offset) { _, line in
@@ -315,7 +401,7 @@ struct MainView: View {
                     .padding(10)
                     .background(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(Color.black.opacity(0.84))
+                            .fill(Color.black.opacity(0.44))
                     )
                 }
             }
@@ -332,37 +418,39 @@ struct PDFItemRow: View {
         Button(action: onTap) {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(isSelected ? Color.blue : Color.gray)
-                    .font(.custom("Avenir Next", size: 16).weight(.semibold))
+                    .foregroundStyle(isSelected ? SurgePalette.flowB : Color.white.opacity(0.45))
+                    .font(.custom("Songti SC", size: 16).weight(.semibold))
                     .padding(.top, 2)
 
                 VStack(alignment: .leading, spacing: 5) {
                     HStack {
                         Text(item.url.lastPathComponent)
-                            .font(.custom("Avenir Next", size: 15).weight(.semibold))
+                            .font(.custom("Songti SC", size: 15).weight(.semibold))
+                            .foregroundStyle(SurgePalette.textPrimary)
                         Spacer()
                         StageBadge(stage: item.stage)
                     }
 
                     Text(item.url.path)
                         .font(.custom("Menlo", size: 12))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(SurgePalette.textSecondary)
                         .lineLimit(1)
 
                     Text("内容提示：\(item.hint.extractedTitle)")
-                        .font(.custom("Avenir Next", size: 13).weight(.medium))
-                        .foregroundStyle(.secondary)
+                        .font(.custom("Songti SC", size: 13).weight(.medium))
+                        .foregroundStyle(SurgePalette.textSecondary)
                         .lineLimit(1)
                 }
             }
-            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(isSelected ? Color.white.opacity(0.95) : Color.white.opacity(0.82))
+                    .fill(isSelected ? Color.white.opacity(0.17) : Color.white.opacity(0.09))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(isSelected ? Color.blue.opacity(0.55) : Color.white.opacity(0.72), lineWidth: 1)
+                    .stroke(isSelected ? SurgePalette.flowB.opacity(0.75) : Color.white.opacity(0.20), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -378,27 +466,27 @@ struct CandidateRow: View {
         Button(action: onTap) {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: selected ? "largecircle.fill.circle" : "circle")
-                    .foregroundStyle(selected ? Color.blue : Color.gray)
+                    .foregroundStyle(selected ? SurgePalette.flowB : Color.white.opacity(0.42))
                     .padding(.top, 2)
 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Text(candidate.primaryTitle)
-                            .font(.custom("Avenir Next", size: 15).weight(.bold))
-                            .foregroundStyle(Color(red: 0.10, green: 0.13, blue: 0.27))
+                            .font(.custom("Songti SC", size: 15).weight(.bold))
+                            .foregroundStyle(SurgePalette.textPrimary)
                         Spacer()
                         Text("\(candidate.confidence)%")
-                            .font(.custom("Avenir Next", size: 12).weight(.bold))
-                            .foregroundStyle(Color(red: 0.22, green: 0.28, blue: 0.73))
+                            .font(.custom("Songti SC", size: 12).weight(.bold))
+                            .foregroundStyle(SurgePalette.flowB)
                     }
 
                     Text("\(candidate.kind.displayName) | \(candidate.authorsText)")
-                        .font(.custom("Avenir Next", size: 13).weight(.medium))
-                        .foregroundStyle(.secondary)
+                        .font(.custom("Songti SC", size: 13).weight(.medium))
+                        .foregroundStyle(SurgePalette.textSecondary)
 
                     Text("\(candidate.publisher) \(candidate.publishedYear)")
-                        .font(.custom("Avenir Next", size: 13))
-                        .foregroundStyle(.secondary)
+                        .font(.custom("Songti SC", size: 13))
+                        .foregroundStyle(SurgePalette.textSecondary)
 
                     HStack(spacing: 6) {
                         if !candidate.isbn.isEmpty {
@@ -414,14 +502,15 @@ struct CandidateRow: View {
                     }
                 }
             }
-            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(selected ? Color.white.opacity(0.96) : Color.white.opacity(0.84))
+                    .fill(selected ? Color.white.opacity(0.16) : Color.white.opacity(0.08))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(selected ? Color.blue.opacity(0.55) : Color.white.opacity(0.72), lineWidth: 1)
+                    .stroke(selected ? SurgePalette.flowB.opacity(0.7) : Color.white.opacity(0.20), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -438,21 +527,31 @@ struct StepPill: View {
 
         HStack(spacing: 6) {
             Text("\(index)")
-                .font(.custom("Avenir Next", size: 12).weight(.bold))
+                .font(.custom("Songti SC", size: 12).weight(.bold))
                 .frame(width: 18, height: 18)
                 .background(
-                    Circle().fill(active ? Color.white : Color.white.opacity(0.6))
+                    Circle().fill(active ? SurgePalette.flowB : Color.white.opacity(0.35))
                 )
-                .foregroundStyle(active ? Color.blue : Color.gray)
+                .foregroundStyle(active ? Color.white : Color.white.opacity(0.7))
 
             Text(title)
-                .font(.custom("Avenir Next", size: 13).weight(.semibold))
+                .font(.custom("Songti SC", size: 13).weight(.semibold))
                 .lineLimit(1)
+                .minimumScaleFactor(0.78)
+                .allowsTightening(true)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(active ? SurgePalette.textPrimary : SurgePalette.textSecondary)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 7)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .background(
-            Capsule().fill(active ? Color.white.opacity(0.88) : Color.white.opacity(0.55))
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(active ? Color.white.opacity(0.18) : Color.white.opacity(0.09))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(active ? SurgePalette.flowB.opacity(0.6) : Color.white.opacity(0.18), lineWidth: 1)
         )
     }
 }
@@ -462,7 +561,7 @@ struct StageBadge: View {
 
     var body: some View {
         Text(stage.displayName)
-            .font(.custom("Avenir Next", size: 11).weight(.bold))
+            .font(.custom("Songti SC", size: 11).weight(.bold))
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
             .background(
@@ -494,11 +593,19 @@ struct MiniChip: View {
 
     var body: some View {
         Text(text)
-            .font(.custom("Avenir Next", size: 12).weight(.semibold))
+            .font(.custom("Songti SC", size: 12).weight(.semibold))
             .padding(.horizontal, 7)
             .padding(.vertical, 3)
-            .background(Capsule().fill(Color(red: 0.11, green: 0.42, blue: 0.78).opacity(0.16)))
-            .foregroundStyle(Color(red: 0.06, green: 0.27, blue: 0.56))
+            .background(
+                Capsule().fill(
+                    LinearGradient(
+                        colors: [SurgePalette.flowB.opacity(0.26), SurgePalette.flowA.opacity(0.16)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+            )
+            .foregroundStyle(SurgePalette.textPrimary)
             .lineLimit(1)
     }
 }
@@ -510,16 +617,35 @@ struct GlassCard<Content: View>: View {
         VStack(alignment: .leading, spacing: 8) {
             content
         }
-        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(18)
+        .foregroundStyle(SurgePalette.textPrimary)
         .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Color.white.opacity(0.97))
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.white.opacity(0.16), Color.white.opacity(0.03)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(Color(red: 0.78, green: 0.84, blue: 0.95).opacity(0.7), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.48), SurgePalette.cardStroke],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
         )
-        .shadow(color: Color.black.opacity(0.13), radius: 16, x: 0, y: 9)
+        .shadow(color: Color.black.opacity(0.32), radius: 26, x: 0, y: 16)
     }
 }
 
@@ -532,8 +658,8 @@ struct CardTitle: View {
 
     var body: some View {
         Text(text)
-            .font(.custom("Avenir Next", size: 19).weight(.bold))
-            .foregroundStyle(Color(red: 0.10, green: 0.12, blue: 0.26))
+            .font(.custom("Songti SC", size: 19).weight(.bold))
+            .foregroundStyle(SurgePalette.textPrimary)
     }
 }
 
@@ -544,15 +670,18 @@ struct CountChip: View {
     var body: some View {
         HStack(spacing: 6) {
             Text(title)
-                .font(.custom("Avenir Next", size: 11).weight(.semibold))
-                .foregroundStyle(.secondary)
+                .font(.custom("Songti SC", size: 11).weight(.semibold))
+                .foregroundStyle(SurgePalette.textSecondary)
             Text(value)
-                .font(.custom("Avenir Next", size: 13).weight(.bold))
-                .foregroundStyle(Color(red: 0.23, green: 0.27, blue: 0.71))
+                .font(.custom("Songti SC", size: 13).weight(.bold))
+                .foregroundStyle(SurgePalette.textPrimary)
         }
-        .padding(.horizontal, 9)
-        .padding(.vertical, 5)
-        .background(Capsule().fill(Color.white.opacity(0.85)))
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Capsule().fill(Color.white.opacity(0.12)))
+        .overlay(
+            Capsule().stroke(Color.white.opacity(0.24), lineWidth: 1)
+        )
     }
 }
 
@@ -564,21 +693,22 @@ struct FieldBlock: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.custom("Avenir Next", size: 13).weight(.semibold))
-                .foregroundStyle(.secondary)
+                .font(.custom("Songti SC", size: 13).weight(.semibold))
+                .foregroundStyle(SurgePalette.textSecondary)
 
             TextField(placeholder, text: $text)
                 .textFieldStyle(.plain)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
-                .font(.custom("Avenir Next", size: 14).weight(.medium))
+                .font(.custom("Songti SC", size: 14).weight(.medium))
+                .foregroundStyle(SurgePalette.textPrimary)
                 .background(
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(Color.white.opacity(0.98))
+                    .fill(Color.white.opacity(0.10))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .stroke(Color(red: 0.69, green: 0.75, blue: 0.89).opacity(0.75), lineWidth: 1)
+                        .stroke(Color.white.opacity(0.22), lineWidth: 1)
                 )
         }
     }
@@ -592,21 +722,22 @@ struct SecureFieldBlock: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.custom("Avenir Next", size: 13).weight(.semibold))
-                .foregroundStyle(.secondary)
+                .font(.custom("Songti SC", size: 13).weight(.semibold))
+                .foregroundStyle(SurgePalette.textSecondary)
 
             SecureField(placeholder, text: $text)
                 .textFieldStyle(.plain)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
-                .font(.custom("Avenir Next", size: 14).weight(.medium))
+                .font(.custom("Songti SC", size: 14).weight(.medium))
+                .foregroundStyle(SurgePalette.textPrimary)
                 .background(
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .fill(Color.white.opacity(0.98))
+                        .fill(Color.white.opacity(0.10))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .stroke(Color(red: 0.69, green: 0.75, blue: 0.89).opacity(0.75), lineWidth: 1)
+                        .stroke(Color.white.opacity(0.22), lineWidth: 1)
                 )
         }
     }
@@ -615,39 +746,44 @@ struct SecureFieldBlock: View {
 struct PrimaryButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.custom("Avenir Next", size: 14).weight(.bold))
+            .font(.custom("Songti SC", size: 14).weight(.bold))
             .foregroundStyle(.white)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 15)
+            .padding(.vertical, 9)
             .background(
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.09, green: 0.43, blue: 0.86),
-                        Color(red: 0.16, green: 0.59, blue: 0.86)
-                    ],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [SurgePalette.flowA, SurgePalette.flowB],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .stroke(Color.white.opacity(0.35), lineWidth: 1)
+                    )
+                    .shadow(color: SurgePalette.flowB.opacity(0.35), radius: 12, x: 0, y: 7)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
-            .opacity(configuration.isPressed ? 0.88 : 1)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .opacity(configuration.isPressed ? 0.86 : 1)
     }
 }
 
 struct SecondaryButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.custom("Avenir Next", size: 13).weight(.bold))
-            .foregroundStyle(Color(red: 0.20, green: 0.25, blue: 0.62))
+            .font(.custom("Songti SC", size: 13).weight(.bold))
+            .foregroundStyle(SurgePalette.textPrimary)
             .padding(.horizontal, 12)
-            .padding(.vertical, 7)
+            .padding(.vertical, 8)
             .background(
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(Color.white.opacity(configuration.isPressed ? 0.80 : 0.94))
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Color.white.opacity(configuration.isPressed ? 0.16 : 0.10))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .stroke(Color(red: 0.62, green: 0.66, blue: 0.90).opacity(0.75), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(Color.white.opacity(0.24), lineWidth: 1)
             )
     }
 }
