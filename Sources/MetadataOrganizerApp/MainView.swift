@@ -286,8 +286,11 @@ struct MainView: View {
                 CardTitle("3) 确认写入 Dublin Core")
 
                 if let item = viewModel.selectedItem {
+                    let selectedCandidate = item.candidates.first(where: { $0.id == item.selectedCandidateID })
+                    let canEditValues = selectedCandidate != nil
+
                     VStack(alignment: .leading, spacing: 6) {
-                        if let candidate = item.candidates.first(where: { $0.id == item.selectedCandidateID }) {
+                        if let candidate = selectedCandidate {
                             Text("当前选中候选：\(candidate.primaryTitle)")
                                 .font(.custom("Songti SC", size: 14).weight(.semibold))
                                 .foregroundStyle(SurgePalette.textPrimary)
@@ -308,12 +311,49 @@ struct MainView: View {
 
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 190), spacing: 8)], spacing: 6) {
                             ForEach(DublinCoreField.allCases, id: \.self) { field in
+                                let rawPreview = viewModel.editableDublinCoreValues[field]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                                let preview = rawPreview.isEmpty ? "—" : rawPreview
+
                                 Toggle(isOn: Binding(
                                     get: { viewModel.selectedDublinCoreFields.contains(field) },
                                     set: { viewModel.setDublinCoreField(field, enabled: $0) }
                                 )) {
-                                    Text(field.rawValue)
-                                        .font(.custom("Songti SC", size: 13).weight(.medium))
+                                    VStack(alignment: .leading, spacing: 6) {
+                                        Text(field.rawValue)
+                                            .font(.custom("Songti SC", size: 13).weight(.medium))
+                                            .foregroundStyle(SurgePalette.textPrimary)
+
+                                        TextField(
+                                            "字段值",
+                                            text: Binding(
+                                                get: { viewModel.editableDublinCoreValues[field] ?? "" },
+                                                set: { viewModel.updateEditableDublinCoreValue($0, for: field) }
+                                            ),
+                                            axis: .vertical
+                                        )
+                                        .textFieldStyle(.plain)
+                                        .lineLimit(1...2)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 6)
+                                        .font(.custom("Songti SC", size: 12).weight(.medium))
+                                        .foregroundStyle(SurgePalette.textPrimary)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                                .fill(Color.white.opacity(0.08))
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                                .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                                        )
+                                        .disabled(!canEditValues)
+
+                                        Text("当前值：\(preview)")
+                                            .font(.custom("Songti SC", size: 11))
+                                            .foregroundStyle(SurgePalette.textSecondary)
+                                            .lineLimit(1)
+                                            .truncationMode(.tail)
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                                 }
                                 .toggleStyle(.checkbox)
                             }
@@ -331,7 +371,7 @@ struct MainView: View {
                         .buttonStyle(PrimaryButton())
                         .disabled(item.selectedCandidateID == nil)
 
-                        Text("写入前会弹窗确认，并显示 Dublin Core 字段映射。")
+                        Text("字段值可手动编辑；确认写入时将使用编辑后的值。")
                             .font(.custom("Songti SC", size: 13))
                             .foregroundStyle(SurgePalette.textSecondary)
                     }
@@ -829,6 +869,7 @@ final class MainViewModel: ObservableObject {
     @Published var selectedItemID: UUID?
     @Published var sourceOptions = MetadataSourceOptions()
     @Published var selectedDublinCoreFields: Set<DublinCoreField> = Set(DublinCoreField.defaultSelected)
+    @Published var editableDublinCoreValues: [DublinCoreField: String] = [:]
 
     @Published var status: String = "准备就绪"
     @Published var logs: [String] = []
@@ -840,6 +881,14 @@ final class MainViewModel: ObservableObject {
 
     private var pendingWriteItemID: UUID?
     @Published var renamePrompt: RenamePromptState?
+
+    private struct EditableValuesContext: Hashable {
+        let itemID: UUID
+        let candidateID: UUID
+    }
+
+    private var editableValuesContext: EditableValuesContext?
+    private var editableValuesCache: [EditableValuesContext: [DublinCoreField: String]] = [:]
 
     private let libraryService = PDFLibraryService()
     private let metadataService = MetadataService()
@@ -892,6 +941,7 @@ final class MainViewModel: ObservableObject {
                 PDFWorkItem(url: url, hint: libraryService.buildHint(for: url))
             }
             selectedItemID = items.first?.id
+            syncEditableDublinCoreValuesForSelection()
             renamePrompt = nil
             status = "已加载 \(items.count) 个 PDF"
             appendLog(status)
@@ -903,6 +953,7 @@ final class MainViewModel: ObservableObject {
 
     func selectItem(_ id: UUID) {
         selectedItemID = id
+        syncEditableDublinCoreValuesForSelection()
     }
 
     func searchMetadataForSelectedItem() {
@@ -940,6 +991,9 @@ final class MainViewModel: ObservableObject {
                 self.items[index].stage = .searched
                 self.status = "检索完成，找到 \(candidates.count) 条候选元数据"
             }
+            if self.selectedItemID == itemID {
+                self.syncEditableDublinCoreValuesForSelection()
+            }
             self.appendLog(self.status)
             self.isSearching = false
         }
@@ -948,6 +1002,9 @@ final class MainViewModel: ObservableObject {
     func chooseCandidate(_ candidateID: UUID, for itemID: UUID) {
         guard let index = items.firstIndex(where: { $0.id == itemID }) else { return }
         items[index].selectedCandidateID = candidateID
+        if selectedItemID == itemID {
+            syncEditableDublinCoreValuesForSelection()
+        }
     }
 
     func setDublinCoreField(_ field: DublinCoreField, enabled: Bool) {
@@ -956,6 +1013,12 @@ final class MainViewModel: ObservableObject {
         } else {
             selectedDublinCoreFields.remove(field)
         }
+    }
+
+    func updateEditableDublinCoreValue(_ value: String, for field: DublinCoreField) {
+        editableDublinCoreValues[field] = value
+        guard let context = editableValuesContext else { return }
+        editableValuesCache[context] = editableDublinCoreValues
     }
 
     func askWriteConfirmationForSelectedItem() {
@@ -972,7 +1035,7 @@ final class MainViewModel: ObservableObject {
             return
         }
 
-        let entries = dublinCoreEntries(for: candidate, fileURL: item.url)
+        let entries = dublinCoreEntries(for: item, candidate: candidate)
         let preview = entries
             .sorted(by: { $0.key < $1.key })
             .map { "\($0.key): \($0.value)" }
@@ -1006,7 +1069,7 @@ final class MainViewModel: ObservableObject {
             return
         }
 
-        let entries = dublinCoreEntries(for: candidate, fileURL: url)
+        let entries = dublinCoreEntries(for: items[index], candidate: candidate)
 
         do {
             try metadataService.writeMetadata(fileURL: url, entries: entries)
@@ -1073,7 +1136,7 @@ final class MainViewModel: ObservableObject {
         return item.candidates.first(where: { $0.id == id })
     }
 
-    private func dublinCoreEntries(for candidate: BookMetadataCandidate, fileURL: URL) -> [String: String] {
+    func dublinCoreValueMap(for candidate: BookMetadataCandidate, fileURL: URL) -> [DublinCoreField: String] {
         let dcIdentifier: String = {
             if !candidate.isbn.isEmpty { return "isbn:\(candidate.isbn)" }
             if !candidate.doi.isEmpty { return "doi:\(candidate.doi)" }
@@ -1087,7 +1150,7 @@ final class MainViewModel: ObservableObject {
             .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
             .joined(separator: " | validation: ")
 
-        let all: [DublinCoreField: String] = [
+        return [
             .title: candidate.title,
             .creator: candidate.authorsText,
             .publisher: candidate.publisher,
@@ -1101,6 +1164,35 @@ final class MainViewModel: ObservableObject {
             .relation: candidate.sourceURL,
             .description: description
         ]
+    }
+
+    private func syncEditableDublinCoreValuesForSelection() {
+        guard let item = selectedItem,
+              let candidate = selectedCandidate(for: item)
+        else {
+            editableValuesContext = nil
+            editableDublinCoreValues = [:]
+            return
+        }
+
+        let context = EditableValuesContext(itemID: item.id, candidateID: candidate.id)
+        editableValuesContext = context
+        editableDublinCoreValues = editableValuesMap(for: item, candidate: candidate)
+    }
+
+    private func editableValuesMap(for item: PDFWorkItem, candidate: BookMetadataCandidate) -> [DublinCoreField: String] {
+        let context = EditableValuesContext(itemID: item.id, candidateID: candidate.id)
+        if let cached = editableValuesCache[context] {
+            return cached
+        }
+
+        let generated = dublinCoreValueMap(for: candidate, fileURL: item.url)
+        editableValuesCache[context] = generated
+        return generated
+    }
+
+    private func dublinCoreEntries(for item: PDFWorkItem, candidate: BookMetadataCandidate) -> [String: String] {
+        let all = editableValuesMap(for: item, candidate: candidate)
 
         var entries: [String: String] = [:]
         for field in DublinCoreField.allCases where selectedDublinCoreFields.contains(field) {
