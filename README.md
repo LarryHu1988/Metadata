@@ -2,8 +2,6 @@
 
 A desktop app for managing metadata of book/paper PDFs.
 
-中文在前，English below.
-
 ## 中文介绍 🇨🇳
 
 ### ✨ 核心功能
@@ -44,9 +42,6 @@ swift build
 
 输出目录：`dist/`
 
-### 🍎 App Store 文案
-上架文案草稿见：[`docs/APP_STORE_LISTING.md`](docs/APP_STORE_LISTING.md)
-
 ---
 
 ## English 🇺🇸
@@ -85,6 +80,3 @@ swift build
 ```
 
 Artifacts are generated in `dist/`.
-
-### 🍎 App Store Listing Draft
-See [`docs/APP_STORE_LISTING.md`](docs/APP_STORE_LISTING.md).
