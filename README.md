@@ -24,6 +24,14 @@ A desktop app for managing metadata of book/paper PDFs.
 - 在 Finder 中右键 `PDF Librarian.app` -> `打开`
 - 或在 `系统设置 -> 隐私与安全性` 中允许打开
 
+若弹窗提示：`Apple 无法验证“PDF Librarian.app”是否包含可能危害 Mac 安全或泄漏隐私的恶意软件`
+
+请按以下步骤解除：
+1. 先关闭提示框，把 `PDF Librarian.app` 拖到 `Applications`
+2. 打开 `系统设置 -> 隐私与安全性`
+3. 在底部“安全性”区域找到被拦截提示，点击 `仍要打开`
+4. 再次打开 App，出现确认框时点击 `打开`
+
 ### 🧭 固定工作流
 1. 选择 PDF 文件或文件夹（递归扫描 PDF）
 2. 联网检索并合并候选元数据
@@ -65,6 +73,15 @@ swift build
 If macOS blocks first launch:
 - Right-click the app in Finder and choose `Open`
 - Or allow it in `System Settings -> Privacy & Security`
+
+If you see the warning:
+`Apple cannot verify “PDF Librarian.app” is free of malware that may harm your Mac or compromise your privacy`
+
+Use these steps:
+1. Close the alert and move `PDF Librarian.app` to `Applications`
+2. Open `System Settings -> Privacy & Security`
+3. In the Security section, find the blocked app message and click `Open Anyway`
+4. Launch the app again and click `Open` in the confirmation dialog
 
 ### 🧭 Workflow
 1. Select a PDF file/folder
