@@ -14,11 +14,11 @@ enum PublicationKind: String, Hashable, Codable {
     var displayName: String {
         switch self {
         case .book:
-            return "书籍"
+            return AppLocalization.text(.publicationBook)
         case .paper:
-            return "文献"
+            return AppLocalization.text(.publicationPaper)
         case .unknown:
-            return "未知"
+            return AppLocalization.text(.publicationUnknown)
         }
     }
 }
@@ -34,17 +34,17 @@ enum PDFWorkflowStage: String, Hashable {
     var displayName: String {
         switch self {
         case .loaded:
-            return "已加载"
+            return AppLocalization.text(.stageLoaded)
         case .searched:
-            return "已检索"
+            return AppLocalization.text(.stageSearched)
         case .written:
-            return "已写入"
+            return AppLocalization.text(.stageWritten)
         case .renamed:
-            return "已重命名"
+            return AppLocalization.text(.stageRenamed)
         case .renameSkipped:
-            return "已跳过重命名"
+            return AppLocalization.text(.stageRenameSkipped)
         case .failed:
-            return "错误"
+            return AppLocalization.text(.stageFailed)
         }
     }
 }
@@ -80,7 +80,7 @@ struct BookMetadataCandidate: Identifiable, Hashable {
     }
 
     var authorsText: String {
-        if authors.isEmpty { return "未知作者" }
+        if authors.isEmpty { return AppLocalization.text(.unknownAuthor) }
         return authors.joined(separator: ", ")
     }
 }
@@ -114,19 +114,19 @@ enum AppError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidDirectory:
-            return "目录不存在或不可访问。"
+            return AppLocalization.text(.errorInvalidDirectory)
         case .invalidFile:
-            return "请选择 PDF 文件或包含 PDF 的目录。"
+            return AppLocalization.text(.errorInvalidFile)
         case .invalidInput(let value):
-            return "输入无效: \(value)"
+            return AppLocalization.format(.errorInvalidInput, arguments: [value])
         case .readFailure(let url):
-            return "读取失败: \(url.path)"
+            return AppLocalization.format(.errorReadFailure, arguments: [url.path])
         case .writeFailure(let url):
-            return "写入失败: \(url.path)"
+            return AppLocalization.format(.errorWriteFailure, arguments: [url.path])
         case .moveFailure(let from, let to):
-            return "移动失败: \(from.path) -> \(to.path)"
+            return AppLocalization.format(.errorMoveFailure, arguments: [from.path, to.path])
         case .networkFailure(let message):
-            return "网络请求失败: \(message)"
+            return AppLocalization.format(.errorNetworkFailure, arguments: [message])
         }
     }
 }

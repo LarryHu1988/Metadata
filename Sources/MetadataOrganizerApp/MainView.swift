@@ -34,16 +34,24 @@ struct MainView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .alert("确认写入元数据？", isPresented: $viewModel.showWriteConfirmation) {
-            Button("取消", role: .cancel) {
+        .alert(text(.alertWriteTitle), isPresented: $viewModel.showWriteConfirmation) {
+            Button(text(.buttonCancel), role: .cancel) {
                 viewModel.cancelWriteConfirmation()
             }
-            Button("确认写入") {
+            Button(text(.buttonConfirmWrite)) {
                 viewModel.performWriteConfirmed()
             }
         } message: {
             Text(viewModel.pendingWriteSummary)
         }
+    }
+
+    private func text(_ key: AppTextKey) -> String {
+        viewModel.text(key)
+    }
+
+    private func format(_ key: AppTextKey, _ arguments: CVarArg...) -> String {
+        viewModel.format(key, arguments: arguments)
     }
 
     private var background: some View {
@@ -104,21 +112,54 @@ struct MainView: View {
         GlassCard {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Label("PDF 书籍/文献元数据助手", systemImage: "books.vertical.fill")
+                    Label(text(.appTitle), systemImage: "books.vertical.fill")
                         .font(.custom("Songti SC", size: 31).weight(.bold))
                         .foregroundStyle(SurgePalette.textPrimary)
-                    Text("按 4 步流程处理：选择 PDF -> 联网检索与字段合并 -> 确认写入 -> 标准重命名")
+                    Text(text(.appSubtitle))
                         .font(.custom("Songti SC", size: 16).weight(.medium))
                         .foregroundStyle(SurgePalette.textSecondary)
                 }
                 Spacer()
-                VStack(alignment: .trailing, spacing: 6) {
-                    CountChip(title: "PDF 文件", value: "\(viewModel.items.count)")
-                    CountChip(title: "当前状态", value: viewModel.currentStageName)
-                    CountChip(title: "版本", value: appVersionText)
+                VStack(alignment: .trailing, spacing: 8) {
+                    languageMenu
+                    CountChip(title: text(.chipPDFFiles), value: "\(viewModel.items.count)")
+                    CountChip(title: text(.chipCurrentStatus), value: viewModel.currentStageName)
+                    CountChip(title: text(.chipVersion), value: appVersionText)
                 }
             }
         }
+    }
+
+    private var languageMenu: some View {
+        Menu {
+            ForEach(AppLanguage.supportedTopTen) { language in
+                Button {
+                    viewModel.setLanguage(language)
+                } label: {
+                    HStack {
+                        Text(language.nativeName)
+                        if viewModel.language == language {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "globe")
+                Text("\(text(.chipLanguage)): \(viewModel.language.nativeName)")
+                    .lineLimit(1)
+            }
+            .font(.custom("Songti SC", size: 13).weight(.semibold))
+            .foregroundStyle(SurgePalette.textPrimary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(Capsule().fill(Color.white.opacity(0.13)))
+            .overlay(
+                Capsule().stroke(Color.white.opacity(0.28), lineWidth: 1)
+            )
+        }
+        .menuStyle(.borderlessButton)
     }
 
     private var appVersionText: String {
@@ -130,15 +171,15 @@ struct MainView: View {
     private var stepCard: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 10) {
-                CardTitle("流程步骤")
+                CardTitle(text(.flowTitle))
                 HStack(spacing: 10) {
-                    StepPill(index: 1, title: "选择 PDF", activeStep: viewModel.currentStep)
+                    StepPill(index: 1, title: text(.stepOne), activeStep: viewModel.currentStep)
                         .frame(maxWidth: .infinity, minHeight: 64, maxHeight: 64)
-                    StepPill(index: 2, title: "联网检索+字段合并", activeStep: viewModel.currentStep)
+                    StepPill(index: 2, title: text(.stepTwo), activeStep: viewModel.currentStep)
                         .frame(maxWidth: .infinity, minHeight: 64, maxHeight: 64)
-                    StepPill(index: 3, title: "确认写入 Dublin Core", activeStep: viewModel.currentStep)
+                    StepPill(index: 3, title: text(.stepThree), activeStep: viewModel.currentStep)
                         .frame(maxWidth: .infinity, minHeight: 64, maxHeight: 64)
-                    StepPill(index: 4, title: "询问并重命名", activeStep: viewModel.currentStep)
+                    StepPill(index: 4, title: text(.stepFour), activeStep: viewModel.currentStep)
                         .frame(maxWidth: .infinity, minHeight: 64, maxHeight: 64)
                 }
                 .frame(maxWidth: .infinity)
@@ -149,35 +190,36 @@ struct MainView: View {
     private var stepOneCard: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                CardTitle("1) 选择 PDF")
+                CardTitle(text(.cardOneTitle))
 
                 HStack(spacing: 10) {
-                    FieldBlock(title: "已选路径", placeholder: "请选择 PDF 文件或文件夹", text: $viewModel.sourcePath)
+                    FieldBlock(title: text(.fieldSelectedPath), placeholder: text(.fieldSelectedPathPlaceholder), text: $viewModel.sourcePath)
                         .frame(maxWidth: .infinity)
-                    Button("选择") { viewModel.pickSource() }
+                    Button(text(.buttonChoose)) { viewModel.pickSource() }
                         .buttonStyle(SecondaryButton())
                         .frame(width: 100)
-                    Button("加载 PDF") { viewModel.loadPDFsFromSource() }
+                    Button(text(.buttonLoadPDF)) { viewModel.loadPDFsFromSource() }
                         .buttonStyle(PrimaryButton())
                         .frame(width: 100)
                 }
 
-                Text("如果选择的是文件夹，程序会递归扫描其中所有 PDF。")
+                Text(text(.folderScanHint))
                     .font(.custom("Songti SC", size: 13))
                     .foregroundStyle(SurgePalette.textSecondary)
 
-                Text("已加载 PDF 列表")
+                Text(text(.loadedPDFList))
                     .font(.custom("Songti SC", size: 14).weight(.semibold))
                     .foregroundStyle(SurgePalette.textPrimary)
 
                 if viewModel.items.isEmpty {
-                    Text("尚未加载 PDF")
+                    Text(text(.noPDFLoaded))
                         .foregroundStyle(SurgePalette.textSecondary)
                 } else {
                     LazyVStack(spacing: 8) {
                         ForEach(viewModel.items) { item in
                             PDFItemRow(
                                 item: item,
+                                language: viewModel.language,
                                 isSelected: viewModel.selectedItemID == item.id,
                                 onTap: { viewModel.selectItem(item.id) }
                             )
@@ -191,21 +233,21 @@ struct MainView: View {
     private var stepTwoCard: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                CardTitle("2) 联网检索+字段合并")
+                CardTitle(text(.cardTwoTitle))
 
                 if let item = viewModel.selectedItem {
                     HStack(alignment: .top, spacing: 10) {
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("文件名提示：\(item.hint.fileNameTitle)")
-                            Text("内容标题提示：\(item.hint.extractedTitle)")
+                            Text(format(.hintFileName, item.hint.fileNameTitle))
+                            Text(format(.hintExtractedTitle, item.hint.extractedTitle))
                             if let isbn = item.hint.isbn {
-                                Text("检测到 ISBN：\(isbn)")
+                                Text(format(.hintISBN, isbn))
                             }
                             if let doi = item.hint.doi {
-                                Text("检测到 DOI：\(doi)")
+                                Text(format(.hintDOI, doi))
                             }
                             if !item.hint.snippet.isEmpty {
-                                Text("内容片段：\(item.hint.snippet)")
+                                Text(format(.hintSnippet, item.hint.snippet))
                                     .lineLimit(2)
                             }
                         }
@@ -223,13 +265,13 @@ struct MainView: View {
                         )
 
                         VStack(alignment: .leading, spacing: 6) {
-                            Toggle("Open Library", isOn: $viewModel.sourceOptions.useOpenLibrary)
+                            Toggle(text(.sourceOpenLibrary), isOn: $viewModel.sourceOptions.useOpenLibrary)
                                 .toggleStyle(.switch)
-                            Toggle("Google Books", isOn: $viewModel.sourceOptions.useGoogleBooks)
+                            Toggle(text(.sourceGoogleBooks), isOn: $viewModel.sourceOptions.useGoogleBooks)
                                 .toggleStyle(.switch)
-                            Toggle("豆瓣网页搜索", isOn: $viewModel.sourceOptions.useDoubanWebSearch)
+                            Toggle(text(.sourceDouban), isOn: $viewModel.sourceOptions.useDoubanWebSearch)
                                 .toggleStyle(.switch)
-                            Toggle("Library of Congress", isOn: $viewModel.sourceOptions.useLibraryOfCongress)
+                            Toggle(text(.sourceLOC), isOn: $viewModel.sourceOptions.useLibraryOfCongress)
                                 .toggleStyle(.switch)
                         }
                         .font(.custom("Songti SC", size: 14).weight(.semibold))
@@ -246,19 +288,19 @@ struct MainView: View {
                     }
 
                     HStack(spacing: 8) {
-                        Button(viewModel.isSearching ? "正在搜索..." : "联网搜索元数据") {
+                        Button(viewModel.isSearching ? text(.buttonSearching) : text(.buttonSearchMetadata)) {
                             viewModel.searchMetadataForSelectedItem()
                         }
                         .buttonStyle(PrimaryButton())
                         .disabled(viewModel.isSearching)
 
-                        Text("执行策略：多源并行 -> ISBN/DOI/标题作者去重 -> 字段合并 -> 置信度排序")
+                        Text(text(.searchStrategy))
                             .font(.custom("Songti SC", size: 12))
                             .foregroundStyle(SurgePalette.textSecondary)
                     }
 
                     if item.candidates.isEmpty {
-                        Text("还没有候选元数据，请先执行联网搜索。")
+                        Text(text(.noCandidates))
                             .font(.custom("Songti SC", size: 13))
                             .foregroundStyle(SurgePalette.textSecondary)
                     } else {
@@ -266,6 +308,7 @@ struct MainView: View {
                             ForEach(item.candidates) { candidate in
                                 CandidateRow(
                                     candidate: candidate,
+                                    language: viewModel.language,
                                     selected: item.selectedCandidateID == candidate.id,
                                     onTap: { viewModel.chooseCandidate(candidate.id, for: item.id) }
                                 )
@@ -273,7 +316,7 @@ struct MainView: View {
                         }
                     }
                 } else {
-                    Text("请先在第 1 步加载并选择一个 PDF。")
+                    Text(text(.loadAndSelectFirst))
                         .foregroundStyle(SurgePalette.textSecondary)
                 }
             }
@@ -283,7 +326,7 @@ struct MainView: View {
     private var stepThreeCard: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                CardTitle("3) 确认写入 Dublin Core")
+                CardTitle(text(.cardThreeTitle))
 
                 if let item = viewModel.selectedItem {
                     let selectedCandidate = item.candidates.first(where: { $0.id == item.selectedCandidateID })
@@ -291,21 +334,21 @@ struct MainView: View {
 
                     VStack(alignment: .leading, spacing: 6) {
                         if let candidate = selectedCandidate {
-                            Text("当前选中候选：\(candidate.primaryTitle)")
+                            Text(format(.selectedCandidate, candidate.primaryTitle))
                                 .font(.custom("Songti SC", size: 14).weight(.semibold))
                                 .foregroundStyle(SurgePalette.textPrimary)
-                            Text("来源：\(candidate.source) | 置信度：\(candidate.confidence)%")
+                            Text(format(.sourceConfidence, candidate.source, candidate.confidence))
                                 .font(.custom("Songti SC", size: 12))
                                 .foregroundStyle(SurgePalette.textSecondary)
                         } else {
-                            Text("尚未选中候选元数据。请先完成第 2 步搜索并选择候选。")
+                            Text(text(.noSelectedCandidate))
                                 .font(.custom("Songti SC", size: 13))
                                 .foregroundStyle(SurgePalette.textSecondary)
                         }
                     }
 
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Dublin Core 写入字段（可选择）")
+                        Text(text(.dublinFieldsTitle))
                             .font(.custom("Songti SC", size: 14).weight(.semibold))
                             .foregroundStyle(SurgePalette.textPrimary)
 
@@ -324,7 +367,7 @@ struct MainView: View {
                                             .foregroundStyle(SurgePalette.textPrimary)
 
                                         TextField(
-                                            "字段值",
+                                            text(.fieldValuePlaceholder),
                                             text: Binding(
                                                 get: { viewModel.editableDublinCoreValues[field] ?? "" },
                                                 set: { viewModel.updateEditableDublinCoreValue($0, for: field) }
@@ -347,7 +390,7 @@ struct MainView: View {
                                         )
                                         .disabled(!canEditValues)
 
-                                        Text("当前值：\(preview)")
+                                        Text(format(.fieldCurrentValue, preview))
                                             .font(.custom("Songti SC", size: 11))
                                             .foregroundStyle(SurgePalette.textSecondary)
                                             .lineLimit(1)
@@ -359,24 +402,24 @@ struct MainView: View {
                             }
                         }
 
-                        Text("已选 \(viewModel.selectedDublinCoreFields.count) 个字段")
+                        Text(format(.selectedFieldsCount, viewModel.selectedDublinCoreFields.count))
                             .font(.custom("Songti SC", size: 12))
                             .foregroundStyle(SurgePalette.textSecondary)
                     }
 
                     HStack(spacing: 8) {
-                        Button("确认写入 Dublin Core 元数据") {
+                        Button(text(.buttonConfirmWriteDublin)) {
                             viewModel.askWriteConfirmationForSelectedItem()
                         }
                         .buttonStyle(PrimaryButton())
                         .disabled(item.selectedCandidateID == nil)
 
-                        Text("字段值可手动编辑；确认写入时将使用编辑后的值。")
+                        Text(text(.editableHint))
                             .font(.custom("Songti SC", size: 13))
                             .foregroundStyle(SurgePalette.textSecondary)
                     }
                 } else {
-                    Text("请先在第 1 步加载并选择一个 PDF。")
+                    Text(text(.loadAndSelectFirst))
                         .foregroundStyle(SurgePalette.textSecondary)
                 }
             }
@@ -386,40 +429,40 @@ struct MainView: View {
     private var stepFourCard: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                CardTitle("4) 询问并重命名")
+                CardTitle(text(.cardFourTitle))
 
                 if let prompt = viewModel.renamePrompt {
-                    Text("建议命名：\(prompt.suggestedFileName)")
+                    Text(format(.suggestedFileName, prompt.suggestedFileName))
                         .font(.custom("Songti SC", size: 14).weight(.semibold))
 
-                    Text("规则：书名_作者_出版社_出版年_语言.pdf")
+                    Text(text(.renameRule))
                         .font(.custom("Songti SC", size: 13))
                         .foregroundStyle(SurgePalette.textSecondary)
 
-                    Text("字段内空格会替换为 .，字段之间仍使用 _ 分隔。")
+                    Text(text(.renameRuleNote))
                         .font(.custom("Songti SC", size: 12))
                         .foregroundStyle(SurgePalette.textSecondary)
 
                     HStack(spacing: 8) {
-                        Button("按标准规则重命名") {
+                        Button(text(.buttonRename)) {
                             viewModel.confirmRenameForPrompt()
                         }
                         .buttonStyle(PrimaryButton())
 
-                        Button("暂不重命名") {
+                        Button(text(.buttonSkipRename)) {
                             viewModel.skipRenameForPrompt()
                         }
                         .buttonStyle(SecondaryButton())
                     }
                 } else {
-                    Text("当前没有待确认重命名的文件。")
+                    Text(text(.noRenamePrompt))
                         .foregroundStyle(SurgePalette.textSecondary)
                 }
 
                 Divider()
                     .overlay(Color.white.opacity(0.2))
 
-                Text("执行日志")
+                Text(text(.executionLog))
                     .font(.custom("Songti SC", size: 14).weight(.semibold))
                     .foregroundStyle(SurgePalette.textPrimary)
                 Text(viewModel.status)
@@ -427,7 +470,7 @@ struct MainView: View {
                     .foregroundStyle(SurgePalette.textPrimary)
 
                 if viewModel.logs.isEmpty {
-                    Text("暂无日志")
+                    Text(text(.noLogs))
                         .foregroundStyle(SurgePalette.textSecondary)
                 } else {
                     VStack(alignment: .leading, spacing: 4) {
@@ -451,6 +494,7 @@ struct MainView: View {
 
 struct PDFItemRow: View {
     let item: PDFWorkItem
+    let language: AppLanguage
     let isSelected: Bool
     let onTap: () -> Void
 
@@ -476,7 +520,7 @@ struct PDFItemRow: View {
                         .foregroundStyle(SurgePalette.textSecondary)
                         .lineLimit(1)
 
-                    Text("内容提示：\(item.hint.extractedTitle)")
+                    Text(AppLocalization.format(.contentHint, language: language, arguments: [item.hint.extractedTitle]))
                         .font(.custom("Songti SC", size: 13).weight(.medium))
                         .foregroundStyle(SurgePalette.textSecondary)
                         .lineLimit(1)
@@ -499,6 +543,7 @@ struct PDFItemRow: View {
 
 struct CandidateRow: View {
     let candidate: BookMetadataCandidate
+    let language: AppLanguage
     let selected: Bool
     let onTap: () -> Void
 
@@ -533,10 +578,10 @@ struct CandidateRow: View {
                             MiniChip(text: "ISBN: \(candidate.isbn)")
                         }
                         if !candidate.language.isEmpty {
-                            MiniChip(text: "语言: \(candidate.language)")
+                            MiniChip(text: AppLocalization.format(.chipLanguageCode, language: language, arguments: [candidate.language]))
                         }
                         if !candidate.validatedBy.isEmpty {
-                            MiniChip(text: "校验: \(candidate.validatedBy.joined(separator: "/"))")
+                            MiniChip(text: AppLocalization.format(.chipValidated, language: language, arguments: [candidate.validatedBy.joined(separator: "/")]))
                         }
                         MiniChip(text: candidate.source)
                     }
@@ -864,6 +909,9 @@ struct RenamePromptState {
 
 @MainActor
 final class MainViewModel: ObservableObject {
+    private static let languageDefaultsKey = "app.language.code"
+
+    @Published var language: AppLanguage
     @Published var sourcePath: String = NSHomeDirectory()
     @Published var items: [PDFWorkItem] = []
     @Published var selectedItemID: UUID?
@@ -871,7 +919,7 @@ final class MainViewModel: ObservableObject {
     @Published var selectedDublinCoreFields: Set<DublinCoreField> = Set(DublinCoreField.defaultSelected)
     @Published var editableDublinCoreValues: [DublinCoreField: String] = [:]
 
-    @Published var status: String = "准备就绪"
+    @Published var status: String
     @Published var logs: [String] = []
 
     @Published var isSearching = false
@@ -895,6 +943,32 @@ final class MainViewModel: ObservableObject {
     private let fetcher = BookMetadataFetcher()
     private let renameService = BookRenameService()
 
+    init() {
+        let storedCode = UserDefaults.standard.string(forKey: Self.languageDefaultsKey)
+        let initialLanguage = AppLanguage.from(code: storedCode) ?? AppLanguage.systemPreferred
+        self.language = initialLanguage
+        AppLocalization.currentLanguage = initialLanguage
+        self.status = AppLocalization.text(.statusReady, language: initialLanguage)
+    }
+
+    func text(_ key: AppTextKey) -> String {
+        AppLocalization.text(key, language: language)
+    }
+
+    func format(_ key: AppTextKey, arguments: [CVarArg]) -> String {
+        AppLocalization.format(key, language: language, arguments: arguments)
+    }
+
+    func setLanguage(_ newLanguage: AppLanguage) {
+        guard newLanguage != language else { return }
+        language = newLanguage
+        AppLocalization.currentLanguage = newLanguage
+        UserDefaults.standard.set(newLanguage.rawValue, forKey: Self.languageDefaultsKey)
+
+        status = format(.statusLanguageChanged, arguments: [newLanguage.nativeName])
+        appendLog(status)
+    }
+
     var selectedItem: PDFWorkItem? {
         guard let selectedItemID,
               let item = items.first(where: { $0.id == selectedItemID })
@@ -905,7 +979,7 @@ final class MainViewModel: ObservableObject {
     }
 
     var currentStageName: String {
-        selectedItem?.stage.displayName ?? "未开始"
+        selectedItem?.stage.displayName ?? text(.stageNotStarted)
     }
 
     var currentStep: Int {
@@ -943,10 +1017,10 @@ final class MainViewModel: ObservableObject {
             selectedItemID = items.first?.id
             syncEditableDublinCoreValuesForSelection()
             renamePrompt = nil
-            status = "已加载 \(items.count) 个 PDF"
+            status = format(.statusLoadedCount, arguments: [items.count])
             appendLog(status)
         } catch {
-            status = "加载失败: \(error.localizedDescription)"
+            status = format(.statusLoadFailed, arguments: [error.localizedDescription])
             appendLog(status)
         }
     }
@@ -958,7 +1032,7 @@ final class MainViewModel: ObservableObject {
 
     func searchMetadataForSelectedItem() {
         guard let item = selectedItem else {
-            status = "请先选择一个 PDF"
+            status = text(.statusSelectPDFFirst)
             return
         }
         if isSearching {
@@ -966,7 +1040,7 @@ final class MainViewModel: ObservableObject {
         }
 
         isSearching = true
-        status = "正在联网检索: \(item.url.lastPathComponent)"
+        status = format(.statusSearching, arguments: [item.url.lastPathComponent])
         appendLog(status)
 
         let itemID = item.id
@@ -985,11 +1059,11 @@ final class MainViewModel: ObservableObject {
             self.items[index].selectedCandidateID = candidates.first?.id
             if candidates.isEmpty {
                 self.items[index].stage = .failed
-                self.items[index].lastError = "未找到匹配元数据"
-                self.status = "未找到可用元数据，建议调整文件名后重试"
+                self.items[index].lastError = self.text(.statusNoMatch)
+                self.status = self.text(.statusNoMetadataFound)
             } else {
                 self.items[index].stage = .searched
-                self.status = "检索完成，找到 \(candidates.count) 条候选元数据"
+                self.status = self.format(.statusSearchComplete, arguments: [candidates.count])
             }
             if self.selectedItemID == itemID {
                 self.syncEditableDublinCoreValuesForSelection()
@@ -1025,12 +1099,12 @@ final class MainViewModel: ObservableObject {
         guard let item = selectedItem,
               let candidate = selectedCandidate(for: item)
         else {
-            status = "请先选择一条候选元数据"
+            status = text(.statusSelectCandidate)
             return
         }
 
         guard !selectedDublinCoreFields.isEmpty else {
-            status = "请至少选择一个 Dublin Core 写入字段"
+            status = text(.statusSelectAtLeastOneField)
             appendLog(status)
             return
         }
@@ -1042,7 +1116,7 @@ final class MainViewModel: ObservableObject {
             .joined(separator: "\n")
 
         pendingWriteItemID = item.id
-        pendingWriteSummary = "将按 Dublin Core 写入以下字段：\n\(preview)\n\n确认继续？"
+        pendingWriteSummary = format(.statusWritePreview, arguments: [preview])
         showWriteConfirmation = true
     }
 
@@ -1056,7 +1130,7 @@ final class MainViewModel: ObservableObject {
               let index = items.firstIndex(where: { $0.id == itemID }),
               let candidate = selectedCandidate(for: items[index])
         else {
-            status = "写入失败: 未找到待写入项"
+            status = text(.statusWriteFailedMissingItem)
             appendLog(status)
             return
         }
@@ -1064,7 +1138,7 @@ final class MainViewModel: ObservableObject {
         let url = items[index].url
 
         guard !selectedDublinCoreFields.isEmpty else {
-            status = "写入失败: 没有选中任何 Dublin Core 字段"
+            status = text(.statusWriteFailedNoFields)
             appendLog(status)
             return
         }
@@ -1074,7 +1148,7 @@ final class MainViewModel: ObservableObject {
         do {
             try metadataService.writeMetadata(fileURL: url, entries: entries)
             items[index].stage = .written
-            status = "Dublin Core 元数据写入成功: \(url.lastPathComponent)"
+            status = format(.statusWriteSuccess, arguments: [url.lastPathComponent])
             appendLog(status)
 
             let suggested = renameService.suggestedFileName(for: candidate, originalExtension: url.pathExtension)
@@ -1082,7 +1156,7 @@ final class MainViewModel: ObservableObject {
         } catch {
             items[index].stage = .failed
             items[index].lastError = error.localizedDescription
-            status = "元数据写入失败: \(error.localizedDescription)"
+            status = format(.statusWriteFailed, arguments: [error.localizedDescription])
             appendLog(status)
         }
 
@@ -1095,7 +1169,7 @@ final class MainViewModel: ObservableObject {
               let index = items.firstIndex(where: { $0.id == prompt.itemID }),
               let candidate = selectedCandidate(for: items[index])
         else {
-            status = "无法执行重命名: 缺少上下文"
+            status = text(.statusRenameMissingContext)
             appendLog(status)
             return
         }
@@ -1106,13 +1180,13 @@ final class MainViewModel: ObservableObject {
             let newURL = try renameService.renameFile(at: oldURL, using: candidate)
             items[index].url = newURL
             items[index].stage = .renamed
-            status = "重命名成功: \(oldURL.lastPathComponent) -> \(newURL.lastPathComponent)"
+            status = format(.statusRenameSuccess, arguments: [oldURL.lastPathComponent, newURL.lastPathComponent])
             appendLog(status)
             renamePrompt = nil
         } catch {
             items[index].stage = .failed
             items[index].lastError = error.localizedDescription
-            status = "重命名失败: \(error.localizedDescription)"
+            status = format(.statusRenameFailed, arguments: [error.localizedDescription])
             appendLog(status)
         }
     }
@@ -1126,7 +1200,7 @@ final class MainViewModel: ObservableObject {
         }
 
         items[index].stage = .renameSkipped
-        status = "已跳过重命名: \(items[index].url.lastPathComponent)"
+        status = format(.statusRenameSkipped, arguments: [items[index].url.lastPathComponent])
         appendLog(status)
         renamePrompt = nil
     }

@@ -828,7 +828,7 @@ final class BookMetadataFetcher {
     private func requestData(url: URL, headers: [String: String] = [:]) async throws -> Data {
         var req = URLRequest(url: url)
         req.timeoutInterval = 20
-        req.setValue("MetadataOrganizerApp/0.1", forHTTPHeaderField: "User-Agent")
+        req.setValue("MetadataOrganizerApp/0.5.0", forHTTPHeaderField: "User-Agent")
         for (key, value) in headers {
             req.setValue(value, forHTTPHeaderField: key)
         }

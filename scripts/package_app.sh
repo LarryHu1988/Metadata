@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 APP_NAME="MetadataOrganizerApp"
 BUNDLE_ID="${BUNDLE_ID:-com.larry.metadataorganizer}"
-VERSION="${VERSION:-0.2.0}"
+VERSION="${VERSION:-0.5.0}"
 BUILD_DIR="$ROOT_DIR/.build/release"
 APP_DIR="$ROOT_DIR/dist/${APP_NAME}.app"
 EXECUTABLE="$BUILD_DIR/$APP_NAME"
