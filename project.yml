@@ -1,37 +1,37 @@
-name: MetadataOrganizerApp
+name: PDFLibrarian
 options:
   deploymentTarget:
     macOS: "13.0"
 settings:
   base:
-    PRODUCT_BUNDLE_IDENTIFIER: com.larry.metadataorganizer
+    PRODUCT_BUNDLE_IDENTIFIER: com.larry.pdflibrarian
     SWIFT_VERSION: 5.10
 targets:
-  MetadataOrganizerApp:
+  PDFLibrarian:
     type: application
     platform: macOS
     sources:
-      - Sources/MetadataOrganizerApp
+      - Sources/PDFLibrarian
     settings:
       base:
-        PRODUCT_NAME: MetadataOrganizerApp
-        INFOPLIST_KEY_CFBundleDisplayName: MetadataOrganizerApp
+        PRODUCT_NAME: "PDF Librarian"
+        INFOPLIST_KEY_CFBundleDisplayName: "PDF Librarian"
         INFOPLIST_KEY_LSMinimumSystemVersion: "13.0"
         CODE_SIGN_STYLE: Automatic
     info:
-      path: Sources/MetadataOrganizerApp/Info.plist
+      path: Sources/PDFLibrarian/Info.plist
       properties:
-        CFBundleName: MetadataOrganizerApp
-        CFBundleDisplayName: MetadataOrganizerApp
-        CFBundleShortVersionString: 0.5.0
-        CFBundleVersion: 0.5.0
+        CFBundleName: "PDF Librarian"
+        CFBundleDisplayName: "PDF Librarian"
+        CFBundleShortVersionString: 0.6.0
+        CFBundleVersion: 0.6.0
         NSHighResolutionCapable: true
         NSPrincipalClass: NSApplication
 schemes:
-  MetadataOrganizerApp:
+  PDFLibrarian:
     build:
       targets:
-        MetadataOrganizerApp: all
+        PDFLibrarian: all
     run:
       config: Debug
     archive:

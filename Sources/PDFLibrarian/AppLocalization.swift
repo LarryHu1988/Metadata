@@ -110,6 +110,10 @@ enum AppTextKey {
     case cardTwoTitle
     case hintFileName
     case hintExtractedTitle
+    case hintFileNameLabel
+    case hintExtractedTitleLabel
+    case hintFileNamePlaceholder
+    case hintExtractedTitlePlaceholder
     case hintISBN
     case hintDOI
     case hintSnippet
@@ -272,6 +276,14 @@ enum AppLocalization {
             return "Filename hint: %@"
         case .hintExtractedTitle:
             return "Extracted title hint: %@"
+        case .hintFileNameLabel:
+            return "Filename Hint"
+        case .hintExtractedTitleLabel:
+            return "Extracted Title Hint"
+        case .hintFileNamePlaceholder:
+            return "Edit filename hint for search"
+        case .hintExtractedTitlePlaceholder:
+            return "Edit extracted title hint for search"
         case .hintISBN:
             return "Detected ISBN: %@"
         case .hintDOI:
@@ -471,6 +483,14 @@ enum AppLocalization {
             return "文件名提示：%@"
         case .hintExtractedTitle:
             return "内容标题提示：%@"
+        case .hintFileNameLabel:
+            return "文件名提示"
+        case .hintExtractedTitleLabel:
+            return "内容标题提示"
+        case .hintFileNamePlaceholder:
+            return "可编辑后用于检索"
+        case .hintExtractedTitlePlaceholder:
+            return "可编辑后用于检索"
         case .hintISBN:
             return "检测到 ISBN：%@"
         case .hintDOI:

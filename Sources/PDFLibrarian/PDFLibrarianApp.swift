@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct MetadataOrganizerApp: App {
+struct PDFLibrarianApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()

@@ -2,17 +2,17 @@
 import PackageDescription
 
 let package = Package(
-    name: "MetadataOrganizerApp",
+    name: "PDFLibrarian",
     platforms: [
         .macOS(.v13)
     ],
     products: [
-        .executable(name: "MetadataOrganizerApp", targets: ["MetadataOrganizerApp"])
+        .executable(name: "PDFLibrarian", targets: ["PDFLibrarian"])
     ],
     targets: [
         .executableTarget(
-            name: "MetadataOrganizerApp",
-            path: "Sources/MetadataOrganizerApp",
+            name: "PDFLibrarian",
+            path: "Sources/PDFLibrarian",
             exclude: ["Info.plist"]
         )
     ]

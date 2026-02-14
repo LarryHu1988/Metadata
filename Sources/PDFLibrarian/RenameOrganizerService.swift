@@ -30,14 +30,21 @@ struct RenameOrganizerService {
 
             let ext = file.pathExtension
             let finalName = ext.isEmpty ? newBaseName : "\(newBaseName).\(ext)"
-            let target = uniqueTargetURL(for: file.deletingLastPathComponent().appendingPathComponent(finalName))
+            let target = uniqueTargetURL(
+                for: file.deletingLastPathComponent().appendingPathComponent(finalName),
+                excluding: file
+            )
 
             if dryRun {
                 logs.append("[DRY] \(file.lastPathComponent) -> \(target.lastPathComponent)")
             } else {
                 do {
-                    try fileManager.moveItem(at: file, to: target)
-                    logs.append("已重命名: \(file.lastPathComponent) -> \(target.lastPathComponent)")
+                    if isSameFileURL(file, target) {
+                        logs.append("保持不变: \(file.lastPathComponent)")
+                    } else {
+                        try fileManager.moveItem(at: file, to: target)
+                        logs.append("已重命名: \(file.lastPathComponent) -> \(target.lastPathComponent)")
+                    }
                 } catch {
                     logs.append("失败: \(file.lastPathComponent) -> \(target.lastPathComponent), \(error.localizedDescription)")
                 }
@@ -71,7 +78,10 @@ struct RenameOrganizerService {
             }
 
             let targetDir = destinationRoot.appendingPathComponent(folderName.isEmpty ? "unknown" : folderName)
-            let targetFile = uniqueTargetURL(for: targetDir.appendingPathComponent(file.lastPathComponent))
+            let targetFile = uniqueTargetURL(
+                for: targetDir.appendingPathComponent(file.lastPathComponent),
+                excluding: file
+            )
 
             if dryRun {
                 logs.append("[DRY] \(file.path) -> \(targetFile.path)")
@@ -79,9 +89,13 @@ struct RenameOrganizerService {
             }
 
             do {
-                try fileManager.createDirectory(at: targetDir, withIntermediateDirectories: true)
-                try fileManager.moveItem(at: file, to: targetFile)
-                logs.append("已整理: \(file.lastPathComponent) -> \(targetDir.lastPathComponent)/")
+                if isSameFileURL(file, targetFile) {
+                    logs.append("保持不变: \(file.lastPathComponent)")
+                } else {
+                    try fileManager.createDirectory(at: targetDir, withIntermediateDirectories: true)
+                    try fileManager.moveItem(at: file, to: targetFile)
+                    logs.append("已整理: \(file.lastPathComponent) -> \(targetDir.lastPathComponent)/")
+                }
             } catch {
                 logs.append("失败: \(file.path) -> \(targetFile.path), \(error.localizedDescription)")
             }
@@ -122,7 +136,10 @@ struct RenameOrganizerService {
         return result
     }
 
-    private func uniqueTargetURL(for desiredURL: URL) -> URL {
+    private func uniqueTargetURL(for desiredURL: URL, excluding sourceURL: URL?) -> URL {
+        if let sourceURL, isSameFileURL(desiredURL, sourceURL) {
+            return desiredURL
+        }
         if !fileManager.fileExists(atPath: desiredURL.path) {
             return desiredURL
         }
@@ -140,6 +157,9 @@ struct RenameOrganizerService {
                 candidateName = "\(base)_\(index).\(ext)"
             }
             let candidate = dir.appendingPathComponent(candidateName)
+            if let sourceURL, isSameFileURL(candidate, sourceURL) {
+                return candidate
+            }
             if !fileManager.fileExists(atPath: candidate.path) {
                 return candidate
             }
@@ -154,6 +174,10 @@ struct RenameOrganizerService {
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: "\n", with: "_")
         return cleaned
+    }
+
+    private func isSameFileURL(_ lhs: URL, _ rhs: URL) -> Bool {
+        lhs.standardizedFileURL.path == rhs.standardizedFileURL.path
     }
 }
 

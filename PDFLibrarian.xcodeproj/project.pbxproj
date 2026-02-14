@@ -1,0 +1,332 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0DAE6330FE396C784E68E185 /* PDFLibrarianApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FDFD4D1B065B0EB060C039 /* PDFLibrarianApp.swift */; };
+		157659F8662F672BD1BFFD5A /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE3821A742C0D44E022D8B06 /* MainView.swift */; };
+		1DB85D3C0366D4D056C7B4F1 /* BookRenameService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DFD21EB422787606270F9B /* BookRenameService.swift */; };
+		24E1CD50E0275D5C47DF649A /* BookMetadataFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29F6F15A7BADAC4C3895C08 /* BookMetadataFetcher.swift */; };
+		64B70828CAC60E8B3086B75D /* RuleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B2EE344DA8C8895ADC9249 /* RuleEngine.swift */; };
+		77C7209D87C40C9AC2B6C948 /* MetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33BA5043DFC63AE6FC1E68F4 /* MetadataService.swift */; };
+		A36E88C21DD2BFF69C8E681E /* AppLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB31CFFB200C00515407807D /* AppLocalization.swift */; };
+		AA97F1989BD84C5A1375A35C /* PDFLibraryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A01DCAFF3126E5C7654052B8 /* PDFLibraryService.swift */; };
+		AC37CB2329FF4EC3C024EF04 /* RenameOrganizerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB055C9E5859FE5144F8F41 /* RenameOrganizerService.swift */; };
+		E3E38A93CB3483C57DA42630 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9EBECF0DFD1841D142D392 /* Models.swift */; };
+		FAC1079E201218656E6CE5D2 /* FileScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C9C4EFD874ED7CB765AC83 /* FileScanner.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		071BB6BCA32D73F177407805 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		1FB055C9E5859FE5144F8F41 /* RenameOrganizerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameOrganizerService.swift; sourceTree = "<group>"; };
+		28C9C4EFD874ED7CB765AC83 /* FileScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileScanner.swift; sourceTree = "<group>"; };
+		33BA5043DFC63AE6FC1E68F4 /* MetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataService.swift; sourceTree = "<group>"; };
+		81DFD21EB422787606270F9B /* BookRenameService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookRenameService.swift; sourceTree = "<group>"; };
+		A01DCAFF3126E5C7654052B8 /* PDFLibraryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFLibraryService.swift; sourceTree = "<group>"; };
+		BB31CFFB200C00515407807D /* AppLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLocalization.swift; sourceTree = "<group>"; };
+		BC589ADC9F79D94B28943C7D /* PDFLibrarian.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PDFLibrarian.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4FDFD4D1B065B0EB060C039 /* PDFLibrarianApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFLibrarianApp.swift; sourceTree = "<group>"; };
+		DC9EBECF0DFD1841D142D392 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		E29F6F15A7BADAC4C3895C08 /* BookMetadataFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookMetadataFetcher.swift; sourceTree = "<group>"; };
+		EE3821A742C0D44E022D8B06 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		F3B2EE344DA8C8895ADC9249 /* RuleEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleEngine.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		5CF3384A5AFB57CA2EAF2793 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BC589ADC9F79D94B28943C7D /* PDFLibrarian.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CF46CF7E3240FD2CE76EA921 /* PDFLibrarian */ = {
+			isa = PBXGroup;
+			children = (
+				BB31CFFB200C00515407807D /* AppLocalization.swift */,
+				E29F6F15A7BADAC4C3895C08 /* BookMetadataFetcher.swift */,
+				81DFD21EB422787606270F9B /* BookRenameService.swift */,
+				28C9C4EFD874ED7CB765AC83 /* FileScanner.swift */,
+				071BB6BCA32D73F177407805 /* Info.plist */,
+				EE3821A742C0D44E022D8B06 /* MainView.swift */,
+				33BA5043DFC63AE6FC1E68F4 /* MetadataService.swift */,
+				DC9EBECF0DFD1841D142D392 /* Models.swift */,
+				D4FDFD4D1B065B0EB060C039 /* PDFLibrarianApp.swift */,
+				A01DCAFF3126E5C7654052B8 /* PDFLibraryService.swift */,
+				1FB055C9E5859FE5144F8F41 /* RenameOrganizerService.swift */,
+				F3B2EE344DA8C8895ADC9249 /* RuleEngine.swift */,
+			);
+			name = PDFLibrarian;
+			path = Sources/PDFLibrarian;
+			sourceTree = "<group>";
+		};
+		F3E5585226B934A8041A81F1 = {
+			isa = PBXGroup;
+			children = (
+				CF46CF7E3240FD2CE76EA921 /* PDFLibrarian */,
+				5CF3384A5AFB57CA2EAF2793 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7C99328501EE91FA234E830F /* PDFLibrarian */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D30D9F10C33972D65EFF058B /* Build configuration list for PBXNativeTarget "PDFLibrarian" */;
+			buildPhases = (
+				6B4231D827EAAC16C0B2AAC8 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PDFLibrarian;
+			packageProductDependencies = (
+			);
+			productName = PDFLibrarian;
+			productReference = BC589ADC9F79D94B28943C7D /* PDFLibrarian.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8981434C7A31FBBB16C267EE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					7C99328501EE91FA234E830F = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 1432B0FD980B2F06FE1771E0 /* Build configuration list for PBXProject "PDFLibrarian" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F3E5585226B934A8041A81F1;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7C99328501EE91FA234E830F /* PDFLibrarian */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6B4231D827EAAC16C0B2AAC8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A36E88C21DD2BFF69C8E681E /* AppLocalization.swift in Sources */,
+				24E1CD50E0275D5C47DF649A /* BookMetadataFetcher.swift in Sources */,
+				1DB85D3C0366D4D056C7B4F1 /* BookRenameService.swift in Sources */,
+				FAC1079E201218656E6CE5D2 /* FileScanner.swift in Sources */,
+				157659F8662F672BD1BFFD5A /* MainView.swift in Sources */,
+				77C7209D87C40C9AC2B6C948 /* MetadataService.swift in Sources */,
+				E3E38A93CB3483C57DA42630 /* Models.swift in Sources */,
+				0DAE6330FE396C784E68E185 /* PDFLibrarianApp.swift in Sources */,
+				AA97F1989BD84C5A1375A35C /* PDFLibraryService.swift in Sources */,
+				AC37CB2329FF4EC3C024EF04 /* RenameOrganizerService.swift in Sources */,
+				64B70828CAC60E8B3086B75D /* RuleEngine.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1ED2E92B383E02BBA416E27B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Sources/PDFLibrarian/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "PDF Librarian";
+				INFOPLIST_KEY_LSMinimumSystemVersion = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_NAME = "PDF Librarian";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		29B5CB1F27A7E81C2189E8ED /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Sources/PDFLibrarian/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "PDF Librarian";
+				INFOPLIST_KEY_LSMinimumSystemVersion = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_NAME = "PDF Librarian";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		9D2B56A0DFF0E9A25764B4C9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.larry.pdflibrarian;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.1;
+			};
+			name = Debug;
+		};
+		AB6EA13B4A2A2E7BE59501E4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.larry.pdflibrarian;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1432B0FD980B2F06FE1771E0 /* Build configuration list for PBXProject "PDFLibrarian" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9D2B56A0DFF0E9A25764B4C9 /* Debug */,
+				AB6EA13B4A2A2E7BE59501E4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D30D9F10C33972D65EFF058B /* Build configuration list for PBXNativeTarget "PDFLibrarian" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1ED2E92B383E02BBA416E27B /* Debug */,
+				29B5CB1F27A7E81C2189E8ED /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8981434C7A31FBBB16C267EE /* Project object */;
+}

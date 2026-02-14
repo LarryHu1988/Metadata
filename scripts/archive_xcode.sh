@@ -4,14 +4,18 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 
-if [[ ! -d "MetadataOrganizerApp.xcodeproj" ]]; then
-  echo "Missing MetadataOrganizerApp.xcodeproj, run: xcodegen generate"
+PROJECT_NAME="PDFLibrarian"
+SCHEME_NAME="PDFLibrarian"
+PROJECT_FILE="${PROJECT_NAME}.xcodeproj"
+
+if [[ ! -d "$PROJECT_FILE" ]]; then
+  echo "Missing $PROJECT_FILE, run: xcodegen generate"
   exit 1
 fi
 
 TEAM_ID="${TEAM_ID:-}"
 EXPORT_METHOD="${EXPORT_METHOD:-developer-id}"
-ARCHIVE_PATH="$ROOT_DIR/dist/MetadataOrganizerApp.xcarchive"
+ARCHIVE_PATH="$ROOT_DIR/dist/${PROJECT_NAME}.xcarchive"
 EXPORT_PATH="$ROOT_DIR/dist/xcode-export"
 EXPORT_PLIST="$ROOT_DIR/dist/ExportOptions.plist"
 
@@ -34,16 +38,16 @@ PLIST
 
 if [[ -n "$TEAM_ID" ]]; then
   xcodebuild \
-    -project MetadataOrganizerApp.xcodeproj \
-    -scheme MetadataOrganizerApp \
+    -project "$PROJECT_FILE" \
+    -scheme "$SCHEME_NAME" \
     -configuration Release \
     -archivePath "$ARCHIVE_PATH" \
     DEVELOPMENT_TEAM="$TEAM_ID" \
     archive
 else
   xcodebuild \
-    -project MetadataOrganizerApp.xcodeproj \
-    -scheme MetadataOrganizerApp \
+    -project "$PROJECT_FILE" \
+    -scheme "$SCHEME_NAME" \
     -configuration Release \
     -archivePath "$ARCHIVE_PATH" \
     archive

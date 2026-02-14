@@ -17,7 +17,10 @@ struct BookRenameService {
 
     func renameFile(at fileURL: URL, using candidate: BookMetadataCandidate) throws -> URL {
         let suggested = suggestedFileName(for: candidate, originalExtension: fileURL.pathExtension)
-        let targetURL = uniqueURL(in: fileURL.deletingLastPathComponent(), fileName: suggested)
+        let targetURL = uniqueURL(in: fileURL.deletingLastPathComponent(), fileName: suggested, excluding: fileURL)
+        if isSameFileURL(targetURL, fileURL) {
+            return fileURL
+        }
 
         do {
             try fileManager.moveItem(at: fileURL, to: targetURL)
@@ -43,8 +46,11 @@ struct BookRenameService {
         return first
     }
 
-    private func uniqueURL(in directory: URL, fileName: String) -> URL {
+    private func uniqueURL(in directory: URL, fileName: String, excluding sourceURL: URL?) -> URL {
         let desired = directory.appendingPathComponent(fileName)
+        if let sourceURL, isSameFileURL(desired, sourceURL) {
+            return desired
+        }
         if !fileManager.fileExists(atPath: desired.path) {
             return desired
         }
@@ -61,6 +67,9 @@ struct BookRenameService {
                 candidateName = "\(base)_\(index).\(ext)"
             }
             let candidateURL = directory.appendingPathComponent(candidateName)
+            if let sourceURL, isSameFileURL(candidateURL, sourceURL) {
+                return candidateURL
+            }
             if !fileManager.fileExists(atPath: candidateURL.path) {
                 return candidateURL
             }
@@ -93,5 +102,9 @@ struct BookRenameService {
     private func tokenOrFallback(_ raw: String, fallback: String) -> String {
         let clean = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         return clean.isEmpty ? fallback : clean
+    }
+
+    private func isSameFileURL(_ lhs: URL, _ rhs: URL) -> Bool {
+        lhs.standardizedFileURL.path == rhs.standardizedFileURL.path
     }
 }

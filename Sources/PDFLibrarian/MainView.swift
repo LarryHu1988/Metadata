@@ -165,6 +165,9 @@ struct MainView: View {
     private var appVersionText: String {
         let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "dev"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? short
+
+        if short.isEmpty { return build }
+        if build.isEmpty || build == short { return short }
         return "\(short)-\(build)"
     }
 
@@ -238,22 +241,40 @@ struct MainView: View {
                 if let item = viewModel.selectedItem {
                     HStack(alignment: .top, spacing: 10) {
                         VStack(alignment: .leading, spacing: 6) {
-                            Text(format(.hintFileName, item.hint.fileNameTitle))
-                            Text(format(.hintExtractedTitle, item.hint.extractedTitle))
+                            FieldBlock(
+                                title: text(.hintFileNameLabel),
+                                placeholder: text(.hintFileNamePlaceholder),
+                                text: Binding(
+                                    get: { viewModel.searchHintFileName(for: item.id) },
+                                    set: { viewModel.updateSearchHintFileName($0, for: item.id) }
+                                )
+                            )
+
+                            FieldBlock(
+                                title: text(.hintExtractedTitleLabel),
+                                placeholder: text(.hintExtractedTitlePlaceholder),
+                                text: Binding(
+                                    get: { viewModel.searchHintExtractedTitle(for: item.id) },
+                                    set: { viewModel.updateSearchHintExtractedTitle($0, for: item.id) }
+                                )
+                            )
+
                             if let isbn = item.hint.isbn {
                                 Text(format(.hintISBN, isbn))
+                                    .font(.custom("Songti SC", size: 13).weight(.medium))
                             }
                             if let doi = item.hint.doi {
                                 Text(format(.hintDOI, doi))
+                                    .font(.custom("Songti SC", size: 13).weight(.medium))
                             }
                             if !item.hint.snippet.isEmpty {
                                 Text(format(.hintSnippet, item.hint.snippet))
+                                    .font(.custom("Songti SC", size: 13).weight(.medium))
                                     .lineLimit(2)
                             }
                         }
-                        .font(.custom("Songti SC", size: 13).weight(.medium))
                         .foregroundStyle(SurgePalette.textSecondary)
-                        .frame(maxWidth: .infinity, minHeight: 126, alignment: .topLeading)
+                        .frame(maxWidth: .infinity, minHeight: 170, alignment: .topLeading)
                         .padding(12)
                         .background(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -275,7 +296,7 @@ struct MainView: View {
                                 .toggleStyle(.switch)
                         }
                         .font(.custom("Songti SC", size: 14).weight(.semibold))
-                        .frame(maxWidth: .infinity, minHeight: 126, alignment: .topLeading)
+                        .frame(maxWidth: .infinity, minHeight: 170, alignment: .topLeading)
                         .padding(12)
                         .background(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -1030,6 +1051,34 @@ final class MainViewModel: ObservableObject {
         syncEditableDublinCoreValuesForSelection()
     }
 
+    func searchHintFileName(for itemID: UUID) -> String {
+        items.first(where: { $0.id == itemID })?.hint.fileNameTitle ?? ""
+    }
+
+    func searchHintExtractedTitle(for itemID: UUID) -> String {
+        items.first(where: { $0.id == itemID })?.hint.extractedTitle ?? ""
+    }
+
+    func updateSearchHintFileName(_ value: String, for itemID: UUID) {
+        guard let index = items.firstIndex(where: { $0.id == itemID }) else { return }
+        let current = items[index].hint
+        items[index].hint = rebuiltSearchHint(
+            from: current,
+            fileNameTitle: value,
+            extractedTitle: current.extractedTitle
+        )
+    }
+
+    func updateSearchHintExtractedTitle(_ value: String, for itemID: UUID) {
+        guard let index = items.firstIndex(where: { $0.id == itemID }) else { return }
+        let current = items[index].hint
+        items[index].hint = rebuiltSearchHint(
+            from: current,
+            fileNameTitle: current.fileNameTitle,
+            extractedTitle: value
+        )
+    }
+
     func searchMetadataForSelectedItem() {
         guard let item = selectedItem else {
             status = text(.statusSelectPDFFirst)
@@ -1208,6 +1257,40 @@ final class MainViewModel: ObservableObject {
     private func selectedCandidate(for item: PDFWorkItem) -> BookMetadataCandidate? {
         guard let id = item.selectedCandidateID else { return nil }
         return item.candidates.first(where: { $0.id == id })
+    }
+
+    private func rebuiltSearchHint(
+        from base: PDFSearchHint,
+        fileNameTitle: String,
+        extractedTitle: String
+    ) -> PDFSearchHint {
+        let file = fileNameTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        let extracted = extractedTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        var queryCandidates: [String] = []
+        if let isbn = base.isbn?.trimmingCharacters(in: .whitespacesAndNewlines), !isbn.isEmpty {
+            queryCandidates.append("isbn \(isbn)")
+            queryCandidates.append(isbn)
+        }
+        if let doi = base.doi?.trimmingCharacters(in: .whitespacesAndNewlines), !doi.isEmpty {
+            queryCandidates.append(doi)
+        }
+        if !extracted.isEmpty {
+            queryCandidates.append(extracted)
+        }
+        if !file.isEmpty && file != extracted {
+            queryCandidates.append(file)
+        }
+
+        let uniqueQueries = Array(NSOrderedSet(array: queryCandidates)) as? [String] ?? queryCandidates
+        return PDFSearchHint(
+            fileNameTitle: file,
+            extractedTitle: extracted,
+            snippet: base.snippet,
+            isbn: base.isbn,
+            doi: base.doi,
+            queryCandidates: uniqueQueries
+        )
     }
 
     func dublinCoreValueMap(for candidate: BookMetadataCandidate, fileURL: URL) -> [DublinCoreField: String] {

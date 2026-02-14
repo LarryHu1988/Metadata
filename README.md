@@ -1,4 +1,4 @@
-# MetadataOrganizerApp (macOS)
+# PDF Librarian (macOS)
 
 面向书籍 PDF / 文献 PDF 的元数据处理工具。
 
@@ -80,4 +80,4 @@ swift run
 ./scripts/package_app.sh
 ```
 
-输出：`dist/MetadataOrganizerApp.app`
+输出：`dist/PDF Librarian.app`
