@@ -94,6 +94,10 @@ enum AppTextKey {
     case chipCurrentStatus
     case chipVersion
     case chipLanguage
+    case chipAppearance
+    case appearanceSystem
+    case appearanceLightDay
+    case appearanceDarkMoon
     case flowTitle
     case stepOne
     case stepTwo
@@ -161,6 +165,7 @@ enum AppTextKey {
     case unknownAuthor
     case statusReady
     case statusLanguageChanged
+    case statusAppearanceChanged
     case statusLoadedCount
     case statusLoadFailed
     case statusSelectPDFFirst
@@ -244,6 +249,14 @@ enum AppLocalization {
             return "Version"
         case .chipLanguage:
             return "Language"
+        case .chipAppearance:
+            return "Theme"
+        case .appearanceSystem:
+            return "System"
+        case .appearanceLightDay:
+            return "Daylight"
+        case .appearanceDarkMoon:
+            return "Moonlight"
         case .flowTitle:
             return "Workflow Steps"
         case .stepOne:
@@ -378,6 +391,8 @@ enum AppLocalization {
             return "Ready"
         case .statusLanguageChanged:
             return "Language switched to %@"
+        case .statusAppearanceChanged:
+            return "Theme switched to %@"
         case .statusLoadedCount:
             return "Loaded %d PDF(s)"
         case .statusLoadFailed:
@@ -451,6 +466,14 @@ enum AppLocalization {
             return "版本"
         case .chipLanguage:
             return "语言"
+        case .chipAppearance:
+            return "外观"
+        case .appearanceSystem:
+            return "跟随系统"
+        case .appearanceLightDay:
+            return "日光"
+        case .appearanceDarkMoon:
+            return "月光"
         case .flowTitle:
             return "流程步骤"
         case .stepOne:
@@ -585,6 +608,8 @@ enum AppLocalization {
             return "准备就绪"
         case .statusLanguageChanged:
             return "语言已切换为 %@"
+        case .statusAppearanceChanged:
+            return "外观已切换为 %@"
         case .statusLoadedCount:
             return "已加载 %d 个 PDF"
         case .statusLoadFailed:

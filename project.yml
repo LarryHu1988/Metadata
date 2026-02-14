@@ -23,8 +23,8 @@ targets:
       properties:
         CFBundleName: "PDF Librarian"
         CFBundleDisplayName: "PDF Librarian"
-        CFBundleShortVersionString: 0.6.0
-        CFBundleVersion: 0.6.0
+        CFBundleShortVersionString: 1.0.0
+        CFBundleVersion: 1.0.0
         NSHighResolutionCapable: true
         NSPrincipalClass: NSApplication
 schemes:

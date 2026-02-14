@@ -1,19 +1,127 @@
 import SwiftUI
 import AppKit
 
-private enum SurgePalette {
-    static let canvasTop = Color(red: 0.03, green: 0.08, blue: 0.16)
-    static let canvasBottom = Color(red: 0.02, green: 0.13, blue: 0.24)
-    static let flowA = Color(red: 0.11, green: 0.41, blue: 0.74)
-    static let flowB = Color(red: 0.16, green: 0.64, blue: 0.88)
-    static let flowC = Color(red: 0.06, green: 0.29, blue: 0.56)
-    static let textPrimary = Color.white.opacity(0.95)
-    static let textSecondary = Color.white.opacity(0.72)
-    static let cardStroke = Color.white.opacity(0.28)
+enum AppAppearanceMode: String, CaseIterable, Identifiable {
+    case system
+    case light
+    case dark
+
+    var id: String { rawValue }
+
+    var iconName: String {
+        switch self {
+        case .system:
+            return "circle.lefthalf.filled"
+        case .light:
+            return "sun.max"
+        case .dark:
+            return "moon.stars"
+        }
+    }
+
+    var textKey: AppTextKey {
+        switch self {
+        case .system:
+            return .appearanceSystem
+        case .light:
+            return .appearanceLightDay
+        case .dark:
+            return .appearanceDarkMoon
+        }
+    }
+
+    var preferredColorScheme: ColorScheme? {
+        switch self {
+        case .system:
+            return nil
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        }
+    }
+}
+
+private struct SurgePalette {
+    let isDark: Bool
+    let canvasTop: Color
+    let canvasBottom: Color
+    let flowA: Color
+    let flowB: Color
+    let flowC: Color
+    let textPrimary: Color
+    let textSecondary: Color
+    let cardStroke: Color
+    let logBackground: Color
+    let logText: Color
+
+    static let dark = SurgePalette(
+        isDark: true,
+        canvasTop: Color(red: 0.03, green: 0.08, blue: 0.16),
+        canvasBottom: Color(red: 0.02, green: 0.13, blue: 0.24),
+        flowA: Color(red: 0.11, green: 0.41, blue: 0.74),
+        flowB: Color(red: 0.16, green: 0.64, blue: 0.88),
+        flowC: Color(red: 0.06, green: 0.29, blue: 0.56),
+        textPrimary: Color.white.opacity(0.95),
+        textSecondary: Color.white.opacity(0.72),
+        cardStroke: Color.white.opacity(0.28),
+        logBackground: Color.black.opacity(0.44),
+        logText: Color.white.opacity(0.9)
+    )
+
+    static let light = SurgePalette(
+        isDark: false,
+        canvasTop: Color(red: 0.94, green: 0.97, blue: 1.0),
+        canvasBottom: Color(red: 0.88, green: 0.93, blue: 0.98),
+        flowA: Color(red: 0.34, green: 0.62, blue: 0.88),
+        flowB: Color(red: 0.24, green: 0.54, blue: 0.83),
+        flowC: Color(red: 0.57, green: 0.76, blue: 0.91),
+        textPrimary: Color.black.opacity(0.85),
+        textSecondary: Color.black.opacity(0.60),
+        cardStroke: Color.black.opacity(0.14),
+        logBackground: Color.white.opacity(0.72),
+        logText: Color.black.opacity(0.83)
+    )
+
+    static func resolved(for colorScheme: ColorScheme) -> SurgePalette {
+        colorScheme == .dark ? .dark : .light
+    }
+
+    func surface(_ darkOpacity: Double, _ lightOpacity: Double) -> Color {
+        Color.white.opacity(isDark ? darkOpacity : lightOpacity)
+    }
+
+    func stroke(_ darkOpacity: Double, _ lightOpacity: Double) -> Color {
+        isDark ? Color.white.opacity(darkOpacity) : Color.black.opacity(lightOpacity)
+    }
+
+    func neutral(_ darkOpacity: Double, _ lightOpacity: Double) -> Color {
+        isDark ? Color.white.opacity(darkOpacity) : Color.black.opacity(lightOpacity)
+    }
+}
+
+private struct SurgePaletteKey: EnvironmentKey {
+    static let defaultValue: SurgePalette = .dark
+}
+
+private extension EnvironmentValues {
+    var surgePalette: SurgePalette {
+        get { self[SurgePaletteKey.self] }
+        set { self[SurgePaletteKey.self] = newValue }
+    }
 }
 
 struct MainView: View {
     @StateObject private var viewModel = MainViewModel()
+    @Environment(\.colorScheme) private var systemColorScheme
+
+    private var resolvedColorScheme: ColorScheme {
+        viewModel.preferredColorScheme ?? systemColorScheme
+    }
+
+    private var palette: SurgePalette {
+        SurgePalette.resolved(for: resolvedColorScheme)
+    }
 
     var body: some View {
         ZStack {
@@ -44,6 +152,8 @@ struct MainView: View {
         } message: {
             Text(viewModel.pendingWriteSummary)
         }
+        .preferredColorScheme(viewModel.preferredColorScheme)
+        .environment(\.surgePalette, palette)
     }
 
     private func text(_ key: AppTextKey) -> String {
@@ -58,8 +168,8 @@ struct MainView: View {
         ZStack {
             LinearGradient(
                 colors: [
-                    SurgePalette.canvasTop,
-                    SurgePalette.canvasBottom
+                    palette.canvasTop,
+                    palette.canvasBottom
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -67,7 +177,7 @@ struct MainView: View {
             .ignoresSafeArea()
 
             RadialGradient(
-                colors: [SurgePalette.flowA.opacity(0.55), .clear],
+                colors: [palette.flowA.opacity(palette.isDark ? 0.55 : 0.30), .clear],
                 center: .topTrailing,
                 startRadius: 20,
                 endRadius: 680
@@ -75,7 +185,7 @@ struct MainView: View {
             .ignoresSafeArea()
 
             RadialGradient(
-                colors: [SurgePalette.flowB.opacity(0.42), .clear],
+                colors: [palette.flowB.opacity(palette.isDark ? 0.42 : 0.24), .clear],
                 center: .bottomLeading,
                 startRadius: 40,
                 endRadius: 720
@@ -85,7 +195,10 @@ struct MainView: View {
             RoundedRectangle(cornerRadius: 280, style: .continuous)
                 .fill(
                     LinearGradient(
-                        colors: [SurgePalette.flowA.opacity(0.42), SurgePalette.flowC.opacity(0.18)],
+                        colors: [
+                            palette.flowA.opacity(palette.isDark ? 0.42 : 0.24),
+                            palette.flowC.opacity(palette.isDark ? 0.18 : 0.12)
+                        ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -97,7 +210,10 @@ struct MainView: View {
             RoundedRectangle(cornerRadius: 260, style: .continuous)
                 .fill(
                     LinearGradient(
-                        colors: [SurgePalette.flowB.opacity(0.38), SurgePalette.flowC.opacity(0.14)],
+                        colors: [
+                            palette.flowB.opacity(palette.isDark ? 0.38 : 0.22),
+                            palette.flowC.opacity(palette.isDark ? 0.14 : 0.10)
+                        ],
                         startPoint: .topTrailing,
                         endPoint: .bottomLeading
                     )
@@ -114,20 +230,55 @@ struct MainView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Label(text(.appTitle), systemImage: "books.vertical.fill")
                         .font(.custom("Songti SC", size: 31).weight(.bold))
-                        .foregroundStyle(SurgePalette.textPrimary)
+                        .foregroundStyle(palette.textPrimary)
                     Text(text(.appSubtitle))
                         .font(.custom("Songti SC", size: 16).weight(.medium))
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 8) {
-                    languageMenu
+                    HStack(spacing: 8) {
+                        appearanceMenu
+                        languageMenu
+                    }
                     CountChip(title: text(.chipPDFFiles), value: "\(viewModel.items.count)")
                     CountChip(title: text(.chipCurrentStatus), value: viewModel.currentStageName)
                     CountChip(title: text(.chipVersion), value: appVersionText)
                 }
             }
         }
+    }
+
+    private var appearanceMenu: some View {
+        Menu {
+            ForEach(AppAppearanceMode.allCases) { mode in
+                Button {
+                    viewModel.setAppearanceMode(mode)
+                } label: {
+                    HStack {
+                        Text(viewModel.appearanceModeLabel(mode))
+                        if viewModel.appearanceMode == mode {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: viewModel.appearanceMode.iconName)
+                Text("\(text(.chipAppearance)): \(viewModel.appearanceModeLabel(viewModel.appearanceMode))")
+                    .lineLimit(1)
+            }
+            .font(.custom("Songti SC", size: 13).weight(.semibold))
+            .foregroundStyle(palette.textPrimary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(Capsule().fill(palette.surface(0.13, 0.64)))
+            .overlay(
+                Capsule().stroke(palette.stroke(0.28, 0.16), lineWidth: 1)
+            )
+        }
+        .menuStyle(.borderlessButton)
     }
 
     private var languageMenu: some View {
@@ -151,12 +302,12 @@ struct MainView: View {
                     .lineLimit(1)
             }
             .font(.custom("Songti SC", size: 13).weight(.semibold))
-            .foregroundStyle(SurgePalette.textPrimary)
+            .foregroundStyle(palette.textPrimary)
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
-            .background(Capsule().fill(Color.white.opacity(0.13)))
+            .background(Capsule().fill(palette.surface(0.13, 0.64)))
             .overlay(
-                Capsule().stroke(Color.white.opacity(0.28), lineWidth: 1)
+                Capsule().stroke(palette.stroke(0.28, 0.16), lineWidth: 1)
             )
         }
         .menuStyle(.borderlessButton)
@@ -208,15 +359,15 @@ struct MainView: View {
 
                 Text(text(.folderScanHint))
                     .font(.custom("Songti SC", size: 13))
-                    .foregroundStyle(SurgePalette.textSecondary)
+                    .foregroundStyle(palette.textSecondary)
 
                 Text(text(.loadedPDFList))
                     .font(.custom("Songti SC", size: 14).weight(.semibold))
-                    .foregroundStyle(SurgePalette.textPrimary)
+                    .foregroundStyle(palette.textPrimary)
 
                 if viewModel.items.isEmpty {
                     Text(text(.noPDFLoaded))
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
                 } else {
                     LazyVStack(spacing: 8) {
                         ForEach(viewModel.items) { item in
@@ -273,16 +424,16 @@ struct MainView: View {
                                     .lineLimit(2)
                             }
                         }
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
                         .frame(maxWidth: .infinity, minHeight: 170, alignment: .topLeading)
                         .padding(12)
                         .background(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(Color.white.opacity(0.08))
+                                .fill(palette.surface(0.08, 0.62))
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                                .stroke(palette.stroke(0.18, 0.14), lineWidth: 1)
                         )
 
                         VStack(alignment: .leading, spacing: 6) {
@@ -300,11 +451,11 @@ struct MainView: View {
                         .padding(12)
                         .background(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(Color.white.opacity(0.08))
+                                .fill(palette.surface(0.08, 0.62))
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                                .stroke(palette.stroke(0.18, 0.14), lineWidth: 1)
                         )
                     }
 
@@ -317,13 +468,13 @@ struct MainView: View {
 
                         Text(text(.searchStrategy))
                             .font(.custom("Songti SC", size: 12))
-                            .foregroundStyle(SurgePalette.textSecondary)
+                            .foregroundStyle(palette.textSecondary)
                     }
 
                     if item.candidates.isEmpty {
                         Text(text(.noCandidates))
                             .font(.custom("Songti SC", size: 13))
-                            .foregroundStyle(SurgePalette.textSecondary)
+                            .foregroundStyle(palette.textSecondary)
                     } else {
                         VStack(alignment: .leading, spacing: 7) {
                             ForEach(item.candidates) { candidate in
@@ -338,7 +489,7 @@ struct MainView: View {
                     }
                 } else {
                     Text(text(.loadAndSelectFirst))
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
                 }
             }
         }
@@ -357,21 +508,21 @@ struct MainView: View {
                         if let candidate = selectedCandidate {
                             Text(format(.selectedCandidate, candidate.primaryTitle))
                                 .font(.custom("Songti SC", size: 14).weight(.semibold))
-                                .foregroundStyle(SurgePalette.textPrimary)
+                                .foregroundStyle(palette.textPrimary)
                             Text(format(.sourceConfidence, candidate.source, candidate.confidence))
                                 .font(.custom("Songti SC", size: 12))
-                                .foregroundStyle(SurgePalette.textSecondary)
+                                .foregroundStyle(palette.textSecondary)
                         } else {
                             Text(text(.noSelectedCandidate))
                                 .font(.custom("Songti SC", size: 13))
-                                .foregroundStyle(SurgePalette.textSecondary)
+                                .foregroundStyle(palette.textSecondary)
                         }
                     }
 
                     VStack(alignment: .leading, spacing: 6) {
                         Text(text(.dublinFieldsTitle))
                             .font(.custom("Songti SC", size: 14).weight(.semibold))
-                            .foregroundStyle(SurgePalette.textPrimary)
+                            .foregroundStyle(palette.textPrimary)
 
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 190), spacing: 8)], spacing: 6) {
                             ForEach(DublinCoreField.allCases, id: \.self) { field in
@@ -385,7 +536,7 @@ struct MainView: View {
                                     VStack(alignment: .leading, spacing: 6) {
                                         Text(field.rawValue)
                                             .font(.custom("Songti SC", size: 13).weight(.medium))
-                                            .foregroundStyle(SurgePalette.textPrimary)
+                                            .foregroundStyle(palette.textPrimary)
 
                                         TextField(
                                             text(.fieldValuePlaceholder),
@@ -400,20 +551,20 @@ struct MainView: View {
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 6)
                                         .font(.custom("Songti SC", size: 12).weight(.medium))
-                                        .foregroundStyle(SurgePalette.textPrimary)
+                                        .foregroundStyle(palette.textPrimary)
                                         .background(
                                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                                .fill(Color.white.opacity(0.08))
+                                                .fill(palette.surface(0.08, 0.62))
                                         )
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                                .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                                                .stroke(palette.stroke(0.18, 0.14), lineWidth: 1)
                                         )
                                         .disabled(!canEditValues)
 
                                         Text(format(.fieldCurrentValue, preview))
                                             .font(.custom("Songti SC", size: 11))
-                                            .foregroundStyle(SurgePalette.textSecondary)
+                                            .foregroundStyle(palette.textSecondary)
                                             .lineLimit(1)
                                             .truncationMode(.tail)
                                     }
@@ -425,7 +576,7 @@ struct MainView: View {
 
                         Text(format(.selectedFieldsCount, viewModel.selectedDublinCoreFields.count))
                             .font(.custom("Songti SC", size: 12))
-                            .foregroundStyle(SurgePalette.textSecondary)
+                            .foregroundStyle(palette.textSecondary)
                     }
 
                     HStack(spacing: 8) {
@@ -437,11 +588,11 @@ struct MainView: View {
 
                         Text(text(.editableHint))
                             .font(.custom("Songti SC", size: 13))
-                            .foregroundStyle(SurgePalette.textSecondary)
+                            .foregroundStyle(palette.textSecondary)
                     }
                 } else {
                     Text(text(.loadAndSelectFirst))
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
                 }
             }
         }
@@ -458,11 +609,11 @@ struct MainView: View {
 
                     Text(text(.renameRule))
                         .font(.custom("Songti SC", size: 13))
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
 
                     Text(text(.renameRuleNote))
                         .font(.custom("Songti SC", size: 12))
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
 
                     HStack(spacing: 8) {
                         Button(text(.buttonRename)) {
@@ -477,35 +628,35 @@ struct MainView: View {
                     }
                 } else {
                     Text(text(.noRenamePrompt))
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
                 }
 
                 Divider()
-                    .overlay(Color.white.opacity(0.2))
+                    .overlay(palette.stroke(0.2, 0.12))
 
                 Text(text(.executionLog))
                     .font(.custom("Songti SC", size: 14).weight(.semibold))
-                    .foregroundStyle(SurgePalette.textPrimary)
+                    .foregroundStyle(palette.textPrimary)
                 Text(viewModel.status)
                     .font(.custom("Songti SC", size: 13).weight(.semibold))
-                    .foregroundStyle(SurgePalette.textPrimary)
+                    .foregroundStyle(palette.textPrimary)
 
                 if viewModel.logs.isEmpty {
                     Text(text(.noLogs))
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
                 } else {
                     VStack(alignment: .leading, spacing: 4) {
                         ForEach(Array(viewModel.logs.suffix(120).enumerated()), id: \.offset) { _, line in
                             Text(line)
                                 .font(.custom("Menlo", size: 12))
-                                .foregroundStyle(Color.white.opacity(0.9))
+                                .foregroundStyle(palette.logText)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                     .padding(10)
                     .background(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(Color.black.opacity(0.44))
+                            .fill(palette.logBackground)
                     )
                 }
             }
@@ -514,6 +665,7 @@ struct MainView: View {
 }
 
 struct PDFItemRow: View {
+    @Environment(\.surgePalette) private var palette
     let item: PDFWorkItem
     let language: AppLanguage
     let isSelected: Bool
@@ -523,7 +675,7 @@ struct PDFItemRow: View {
         Button(action: onTap) {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(isSelected ? SurgePalette.flowB : Color.white.opacity(0.45))
+                    .foregroundStyle(isSelected ? palette.flowB : palette.neutral(0.45, 0.36))
                     .font(.custom("Songti SC", size: 16).weight(.semibold))
                     .padding(.top, 2)
 
@@ -531,19 +683,19 @@ struct PDFItemRow: View {
                     HStack {
                         Text(item.url.lastPathComponent)
                             .font(.custom("Songti SC", size: 15).weight(.semibold))
-                            .foregroundStyle(SurgePalette.textPrimary)
+                            .foregroundStyle(palette.textPrimary)
                         Spacer()
                         StageBadge(stage: item.stage)
                     }
 
                     Text(item.url.path)
                         .font(.custom("Menlo", size: 12))
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
                         .lineLimit(1)
 
                     Text(AppLocalization.format(.contentHint, language: language, arguments: [item.hint.extractedTitle]))
                         .font(.custom("Songti SC", size: 13).weight(.medium))
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
                         .lineLimit(1)
                 }
             }
@@ -551,11 +703,11 @@ struct PDFItemRow: View {
             .padding(12)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(isSelected ? Color.white.opacity(0.17) : Color.white.opacity(0.09))
+                    .fill(isSelected ? palette.surface(0.17, 0.82) : palette.surface(0.09, 0.62))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(isSelected ? SurgePalette.flowB.opacity(0.75) : Color.white.opacity(0.20), lineWidth: 1)
+                    .stroke(isSelected ? palette.flowB.opacity(0.75) : palette.stroke(0.20, 0.14), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -563,6 +715,7 @@ struct PDFItemRow: View {
 }
 
 struct CandidateRow: View {
+    @Environment(\.surgePalette) private var palette
     let candidate: BookMetadataCandidate
     let language: AppLanguage
     let selected: Bool
@@ -572,27 +725,27 @@ struct CandidateRow: View {
         Button(action: onTap) {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: selected ? "largecircle.fill.circle" : "circle")
-                    .foregroundStyle(selected ? SurgePalette.flowB : Color.white.opacity(0.42))
+                    .foregroundStyle(selected ? palette.flowB : palette.neutral(0.42, 0.34))
                     .padding(.top, 2)
 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Text(candidate.primaryTitle)
                             .font(.custom("Songti SC", size: 15).weight(.bold))
-                            .foregroundStyle(SurgePalette.textPrimary)
+                            .foregroundStyle(palette.textPrimary)
                         Spacer()
                         Text("\(candidate.confidence)%")
                             .font(.custom("Songti SC", size: 12).weight(.bold))
-                            .foregroundStyle(SurgePalette.flowB)
+                            .foregroundStyle(palette.flowB)
                     }
 
                     Text("\(candidate.kind.displayName) | \(candidate.authorsText)")
                         .font(.custom("Songti SC", size: 13).weight(.medium))
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
 
                     Text("\(candidate.publisher) \(candidate.publishedYear)")
                         .font(.custom("Songti SC", size: 13))
-                        .foregroundStyle(SurgePalette.textSecondary)
+                        .foregroundStyle(palette.textSecondary)
 
                     HStack(spacing: 6) {
                         if !candidate.isbn.isEmpty {
@@ -612,11 +765,11 @@ struct CandidateRow: View {
             .padding(12)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(selected ? Color.white.opacity(0.16) : Color.white.opacity(0.08))
+                    .fill(selected ? palette.surface(0.16, 0.80) : palette.surface(0.08, 0.60))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(selected ? SurgePalette.flowB.opacity(0.7) : Color.white.opacity(0.20), lineWidth: 1)
+                    .stroke(selected ? palette.flowB.opacity(0.7) : palette.stroke(0.20, 0.14), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -624,6 +777,7 @@ struct CandidateRow: View {
 }
 
 struct StepPill: View {
+    @Environment(\.surgePalette) private var palette
     let index: Int
     let title: String
     let activeStep: Int
@@ -636,9 +790,9 @@ struct StepPill: View {
                 .font(.custom("Songti SC", size: 12).weight(.bold))
                 .frame(width: 18, height: 18)
                 .background(
-                    Circle().fill(active ? SurgePalette.flowB : Color.white.opacity(0.35))
+                    Circle().fill(active ? palette.flowB : palette.neutral(0.35, 0.24))
                 )
-                .foregroundStyle(active ? Color.white : Color.white.opacity(0.7))
+                .foregroundStyle(active ? Color.white : palette.neutral(0.7, 0.72))
 
             Text(title)
                 .font(.custom("Songti SC", size: 13).weight(.semibold))
@@ -646,18 +800,18 @@ struct StepPill: View {
                 .minimumScaleFactor(0.78)
                 .allowsTightening(true)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(active ? SurgePalette.textPrimary : SurgePalette.textSecondary)
+                .foregroundStyle(active ? palette.textPrimary : palette.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(active ? Color.white.opacity(0.18) : Color.white.opacity(0.09))
+                .fill(active ? palette.surface(0.18, 0.84) : palette.surface(0.09, 0.63))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(active ? SurgePalette.flowB.opacity(0.6) : Color.white.opacity(0.18), lineWidth: 1)
+                .stroke(active ? palette.flowB.opacity(0.6) : palette.stroke(0.18, 0.14), lineWidth: 1)
         )
     }
 }
@@ -695,6 +849,7 @@ struct StageBadge: View {
 }
 
 struct MiniChip: View {
+    @Environment(\.surgePalette) private var palette
     let text: String
 
     var body: some View {
@@ -705,18 +860,22 @@ struct MiniChip: View {
             .background(
                 Capsule().fill(
                     LinearGradient(
-                        colors: [SurgePalette.flowB.opacity(0.26), SurgePalette.flowA.opacity(0.16)],
+                        colors: [
+                            palette.flowB.opacity(palette.isDark ? 0.26 : 0.20),
+                            palette.flowA.opacity(palette.isDark ? 0.16 : 0.14)
+                        ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
             )
-            .foregroundStyle(SurgePalette.textPrimary)
+            .foregroundStyle(palette.textPrimary)
             .lineLimit(1)
     }
 }
 
 struct GlassCard<Content: View>: View {
+    @Environment(\.surgePalette) private var palette
     @ViewBuilder let content: Content
 
     var body: some View {
@@ -725,7 +884,7 @@ struct GlassCard<Content: View>: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(18)
-        .foregroundStyle(SurgePalette.textPrimary)
+        .foregroundStyle(palette.textPrimary)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(.ultraThinMaterial)
@@ -733,7 +892,7 @@ struct GlassCard<Content: View>: View {
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .fill(
                             LinearGradient(
-                                colors: [Color.white.opacity(0.16), Color.white.opacity(0.03)],
+                                colors: [palette.surface(0.16, 0.62), palette.surface(0.03, 0.52)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
@@ -744,18 +903,19 @@ struct GlassCard<Content: View>: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(
                     LinearGradient(
-                        colors: [Color.white.opacity(0.48), SurgePalette.cardStroke],
+                        colors: [palette.stroke(0.48, 0.20), palette.cardStroke],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
                     lineWidth: 1
                 )
         )
-        .shadow(color: Color.black.opacity(0.32), radius: 26, x: 0, y: 16)
+        .shadow(color: Color.black.opacity(palette.isDark ? 0.32 : 0.12), radius: 26, x: 0, y: 16)
     }
 }
 
 struct CardTitle: View {
+    @Environment(\.surgePalette) private var palette
     let text: String
 
     init(_ text: String) {
@@ -765,11 +925,12 @@ struct CardTitle: View {
     var body: some View {
         Text(text)
             .font(.custom("Songti SC", size: 19).weight(.bold))
-            .foregroundStyle(SurgePalette.textPrimary)
+            .foregroundStyle(palette.textPrimary)
     }
 }
 
 struct CountChip: View {
+    @Environment(\.surgePalette) private var palette
     let title: String
     let value: String
 
@@ -777,21 +938,22 @@ struct CountChip: View {
         HStack(spacing: 6) {
             Text(title)
                 .font(.custom("Songti SC", size: 11).weight(.semibold))
-                .foregroundStyle(SurgePalette.textSecondary)
+                .foregroundStyle(palette.textSecondary)
             Text(value)
                 .font(.custom("Songti SC", size: 13).weight(.bold))
-                .foregroundStyle(SurgePalette.textPrimary)
+                .foregroundStyle(palette.textPrimary)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(Capsule().fill(Color.white.opacity(0.12)))
+        .background(Capsule().fill(palette.surface(0.12, 0.64)))
         .overlay(
-            Capsule().stroke(Color.white.opacity(0.24), lineWidth: 1)
+            Capsule().stroke(palette.stroke(0.24, 0.15), lineWidth: 1)
         )
     }
 }
 
 struct FieldBlock: View {
+    @Environment(\.surgePalette) private var palette
     let title: String
     let placeholder: String
     @Binding var text: String
@@ -800,27 +962,28 @@ struct FieldBlock: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.custom("Songti SC", size: 13).weight(.semibold))
-                .foregroundStyle(SurgePalette.textSecondary)
+                .foregroundStyle(palette.textSecondary)
 
             TextField(placeholder, text: $text)
                 .textFieldStyle(.plain)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
                 .font(.custom("Songti SC", size: 14).weight(.medium))
-                .foregroundStyle(SurgePalette.textPrimary)
+                .foregroundStyle(palette.textPrimary)
                 .background(
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(Color.white.opacity(0.10))
+                    .fill(palette.surface(0.10, 0.66))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .stroke(Color.white.opacity(0.22), lineWidth: 1)
+                        .stroke(palette.stroke(0.22, 0.15), lineWidth: 1)
                 )
         }
     }
 }
 
 struct SecureFieldBlock: View {
+    @Environment(\.surgePalette) private var palette
     let title: String
     let placeholder: String
     @Binding var text: String
@@ -829,27 +992,28 @@ struct SecureFieldBlock: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.custom("Songti SC", size: 13).weight(.semibold))
-                .foregroundStyle(SurgePalette.textSecondary)
+                .foregroundStyle(palette.textSecondary)
 
             SecureField(placeholder, text: $text)
                 .textFieldStyle(.plain)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
                 .font(.custom("Songti SC", size: 14).weight(.medium))
-                .foregroundStyle(SurgePalette.textPrimary)
+                .foregroundStyle(palette.textPrimary)
                 .background(
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .fill(Color.white.opacity(0.10))
+                        .fill(palette.surface(0.10, 0.66))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .stroke(Color.white.opacity(0.22), lineWidth: 1)
+                        .stroke(palette.stroke(0.22, 0.15), lineWidth: 1)
                 )
         }
     }
 }
 
 struct PrimaryButton: ButtonStyle {
+    @Environment(\.surgePalette) private var palette
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.custom("Songti SC", size: 14).weight(.bold))
@@ -860,16 +1024,16 @@ struct PrimaryButton: ButtonStyle {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(
                         LinearGradient(
-                            colors: [SurgePalette.flowA, SurgePalette.flowB],
+                            colors: [palette.flowA, palette.flowB],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .stroke(Color.white.opacity(0.35), lineWidth: 1)
+                            .stroke(palette.stroke(0.35, 0.20), lineWidth: 1)
                     )
-                    .shadow(color: SurgePalette.flowB.opacity(0.35), radius: 12, x: 0, y: 7)
+                    .shadow(color: palette.flowB.opacity(0.35), radius: 12, x: 0, y: 7)
             )
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .opacity(configuration.isPressed ? 0.86 : 1)
@@ -877,19 +1041,20 @@ struct PrimaryButton: ButtonStyle {
 }
 
 struct SecondaryButton: ButtonStyle {
+    @Environment(\.surgePalette) private var palette
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.custom("Songti SC", size: 13).weight(.bold))
-            .foregroundStyle(SurgePalette.textPrimary)
+            .foregroundStyle(palette.textPrimary)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color.white.opacity(configuration.isPressed ? 0.16 : 0.10))
+                    .fill(palette.surface(configuration.isPressed ? 0.16 : 0.10, configuration.isPressed ? 0.74 : 0.64))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(Color.white.opacity(0.24), lineWidth: 1)
+                    .stroke(palette.stroke(0.24, 0.15), lineWidth: 1)
             )
     }
 }
@@ -931,8 +1096,10 @@ struct RenamePromptState {
 @MainActor
 final class MainViewModel: ObservableObject {
     private static let languageDefaultsKey = "app.language.code"
+    private static let appearanceDefaultsKey = "app.appearance.mode"
 
     @Published var language: AppLanguage
+    @Published var appearanceMode: AppAppearanceMode
     @Published var sourcePath: String = NSHomeDirectory()
     @Published var items: [PDFWorkItem] = []
     @Published var selectedItemID: UUID?
@@ -967,7 +1134,10 @@ final class MainViewModel: ObservableObject {
     init() {
         let storedCode = UserDefaults.standard.string(forKey: Self.languageDefaultsKey)
         let initialLanguage = AppLanguage.from(code: storedCode) ?? AppLanguage.systemPreferred
+        let storedAppearance = UserDefaults.standard.string(forKey: Self.appearanceDefaultsKey)
+        let initialAppearance = AppAppearanceMode(rawValue: storedAppearance ?? "") ?? .system
         self.language = initialLanguage
+        self.appearanceMode = initialAppearance
         AppLocalization.currentLanguage = initialLanguage
         self.status = AppLocalization.text(.statusReady, language: initialLanguage)
     }
@@ -988,6 +1158,24 @@ final class MainViewModel: ObservableObject {
 
         status = format(.statusLanguageChanged, arguments: [newLanguage.nativeName])
         appendLog(status)
+    }
+
+    func setAppearanceMode(_ newMode: AppAppearanceMode) {
+        guard newMode != appearanceMode else { return }
+        appearanceMode = newMode
+        UserDefaults.standard.set(newMode.rawValue, forKey: Self.appearanceDefaultsKey)
+
+        let modeText = text(newMode.textKey)
+        status = format(.statusAppearanceChanged, arguments: [modeText])
+        appendLog(status)
+    }
+
+    func appearanceModeLabel(_ mode: AppAppearanceMode) -> String {
+        text(mode.textKey)
+    }
+
+    var preferredColorScheme: ColorScheme? {
+        appearanceMode.preferredColorScheme
     }
 
     var selectedItem: PDFWorkItem? {

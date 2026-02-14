@@ -1,83 +1,90 @@
-# PDF Librarian (macOS)
+# PDF Librarian 📚 (macOS)
 
-面向书籍 PDF / 文献 PDF 的元数据处理工具。
+A desktop app for managing metadata of book/paper PDFs.
 
-## 固定流程
+中文在前，English below.
 
-1. 选择单个 PDF 或文件夹（递归扫描 PDF）
-2. 根据文件名与 PDF 内容提示联网检索元数据
-3. 确认后写入 Dublin Core 元数据
-4. 再询问是否按规则重命名
+## 中文介绍 🇨🇳
 
-## 数据源方案
+### ✨ 核心功能
+- 🔎 基于文件名与 PDF 内容提示，联网检索书籍/文献元数据
+- 🌐 多源聚合：Google Books API、Open Library API、豆瓣网页搜索、Library of Congress
+- 🧩 字段去重与合并：按 `ISBN -> DOI -> 标题+作者` 去重并合并字段
+- 🏷️ 支持 Dublin Core 字段选择写入，并可在写入前手动编辑字段值
+- 🧼 写入前清空旧 PDF 内嵌元数据并清空 xattr，再写入新值
+- 📝 按标准规则重命名：`书名_作者_出版社_出版年_语言.pdf`
+- 🎨 支持界面外观切换：`跟随系统 / 日光 / 月光`
+- 🗣️ 支持多语言界面（前十大语言）
 
-- Open Library API
-- Google Books API
-- 豆瓣网页搜索
-- Library of Congress API
+### 🚀 下载安装（GitHub Release）
+1. 打开 [Releases 页面](https://github.com/LarryHu1988/Metadata/releases)
+2. 下载 `PDFLibrarian-1.0.0.dmg`（推荐）或 `PDFLibrarian-1.0.0.zip`
+3. 若是 DMG：打开后将 `PDF Librarian.app` 拖到 `Applications`，即安装完成
+4. 若是 ZIP：解压后将 `.app` 拖到 `Applications`
 
-系统会并行查询多源结果，并按以下规则处理：
+首次打开如遇到系统安全提示：
+- 在 Finder 中右键 `PDF Librarian.app` -> `打开`
+- 或在 `系统设置 -> 隐私与安全性` 中允许打开
 
-- 去重键：`ISBN -> DOI -> 标题+作者`
-- 字段合并：标题、作者、出版社、出版年、语言、标识符取最优非空值
-- 来源合并：候选卡片显示合并后的来源列表与置信度
+### 🧭 固定工作流
+1. 选择 PDF 文件或文件夹（递归扫描 PDF）
+2. 联网检索并合并候选元数据
+3. 选择/编辑 Dublin Core 字段后确认写入
+4. 询问是否按规则重命名
 
-说明：系统仅使用以上四个数据源。
+### 🏷️ 默认勾选写入字段
+`dc:title`、`dc:creator`、`dc:publisher`、`dc:date`、`dc:language`、`dc:type`、`dc:format`、`dc:identifier`、`dc:subject`
 
-## 命名规则
-
-重命名采用：
-
-`书名_作者_出版社_出版年_语言.pdf`
-
-字段规则：
-
-- 字段之间使用 `_` 分隔
-- 每个字段内部若有空格，替换为 `.`
-
-示例：
-
-`Clean.Code_Robert.C.Martin_Prentice.Hall_2008_en.pdf`
-
-## 元数据标准
-
-写入采用 Dublin Core 字段（以 `dc:` 前缀保存）：
-
-- `dc:title`
-- `dc:creator`
-- `dc:publisher`
-- `dc:date`
-- `dc:language`
-- `dc:type`
-- `dc:format`
-- `dc:identifier`
-- `dc:source`
-- `dc:subject`
-- `dc:relation`
-- `dc:description`
-
-字段可在界面中勾选，默认选中：
-
-- `dc:title`
-- `dc:creator`
-- `dc:publisher`
-- `dc:date`
-- `dc:language`
-- `dc:type`
-- `dc:format`
-- `dc:identifier`
-- `dc:subject`
-
-## 运行
-
+### 🛠️ 开发与打包
 ```bash
-swift run
-```
-
-## 打包为可双击 .app
-
-```bash
+swift build
 ./scripts/package_app.sh
+./scripts/build_release_assets.sh
 ```
 
-输出：`dist/PDF Librarian.app`
+输出目录：`dist/`
+
+### 🍎 App Store 文案
+上架文案草稿见：[`docs/APP_STORE_LISTING.md`](docs/APP_STORE_LISTING.md)
+
+---
+
+## English 🇺🇸
+
+### ✨ Features
+- 🔎 Online metadata lookup from filename + extracted PDF hints
+- 🌐 Multi-source aggregation: Google Books API, Open Library API, Douban web search, Library of Congress
+- 🧩 Dedup + merge pipeline using `ISBN -> DOI -> title+author`
+- 🏷️ Selectable Dublin Core fields with editable values before writing
+- 🧼 Clears old embedded PDF metadata and xattrs before writing new values
+- 📝 Standard rename rule: `title_author_publisher_year_language.pdf`
+- 🎨 Appearance modes: `System / Daylight / Moonlight`
+- 🗣️ Multi-language UI support
+
+### 🚀 Install from GitHub Releases
+1. Open the [Releases page](https://github.com/LarryHu1988/Metadata/releases)
+2. Download `PDFLibrarian-1.0.0.dmg` (recommended) or `PDFLibrarian-1.0.0.zip`
+3. For DMG: open it and drag `PDF Librarian.app` to `Applications`
+4. For ZIP: unzip and drag the app into `Applications`
+
+If macOS blocks first launch:
+- Right-click the app in Finder and choose `Open`
+- Or allow it in `System Settings -> Privacy & Security`
+
+### 🧭 Workflow
+1. Select a PDF file/folder
+2. Search & merge online metadata candidates
+3. Select/edit Dublin Core fields and confirm write
+4. Confirm optional rule-based rename
+
+### 🛠️ Build
+```bash
+swift build
+./scripts/package_app.sh
+./scripts/build_release_assets.sh
+```
+
+Artifacts are generated in `dist/`.
+
+### 🍎 App Store Listing Draft
+See [`docs/APP_STORE_LISTING.md`](docs/APP_STORE_LISTING.md).
