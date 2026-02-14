@@ -10,8 +10,13 @@ ZIP_PATH="$ROOT_DIR/dist/${APP_SLUG}-${VERSION}.zip"
 DMG_PATH="$ROOT_DIR/dist/${APP_SLUG}-${VERSION}.dmg"
 DMG_STAGE_DIR="$ROOT_DIR/dist/.dmg-stage-${VERSION}"
 
-if [[ ! -d "$APP_PATH" ]]; then
+# Always rebuild the app before creating release assets to avoid packaging
+# a stale .app that may remain in dist from previous versions.
+if [[ "${SKIP_PACKAGE:-0}" != "1" ]]; then
   VERSION="$VERSION" "$ROOT_DIR/scripts/package_app.sh"
+elif [[ ! -d "$APP_PATH" ]]; then
+  echo "ERROR: SKIP_PACKAGE=1 but app bundle does not exist at: $APP_PATH"
+  exit 1
 fi
 
 rm -f "$ZIP_PATH" "$DMG_PATH"
