@@ -91,6 +91,15 @@ PLIST
 
 if [[ -n "${SIGN_IDENTITY:-}" ]]; then
   codesign --force --deep --options runtime --sign "$SIGN_IDENTITY" "$APP_DIR"
+  echo "Signed app with identity: $SIGN_IDENTITY"
+else
+  # Fallback to ad-hoc bundle signing to avoid broken linker-only signatures
+  # that can trigger “app is damaged” on downloaded artifacts.
+  codesign --force --deep --sign - "$APP_DIR"
+  echo "Signed app with ad-hoc identity (-)"
 fi
+
+# Quick sanity check to ensure packaged app has a valid bundle signature.
+codesign --verify --deep --strict --verbose=2 "$APP_DIR"
 
 echo "App built: $APP_DIR"
