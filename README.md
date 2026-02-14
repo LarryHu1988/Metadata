@@ -11,12 +11,12 @@ A desktop app for managing metadata of book/paper PDFs.
 - 🏷️ 支持 Dublin Core 字段选择写入，并可在写入前手动编辑字段值
 - 🧼 写入前清空旧 PDF 内嵌元数据并清空 xattr，再写入新值
 - 📝 按标准规则重命名：`书名_作者_出版社_出版年_语言.pdf`
-- 🎨 支持界面外观切换：`跟随系统 / 日光 / 月光`
+- 🎨 支持界面外观切换：`日光 / 月光`
 - 🗣️ 支持多语言界面（前十大语言）
 
 ### 🚀 下载安装（GitHub Release）
 1. 打开 [Releases 页面](https://github.com/LarryHu1988/Metadata/releases)
-2. 下载 `PDFLibrarian-1.0.1.dmg`（推荐）或 `PDFLibrarian-1.0.1.zip`
+2. 下载 `PDFLibrarian-1.0.2.dmg`（推荐）或 `PDFLibrarian-1.0.2.zip`
 3. 若是 DMG：打开后将 `PDF Librarian.app` 拖到 `Applications`，即安装完成
 4. 若是 ZIP：解压后将 `.app` 拖到 `Applications`
 
@@ -61,12 +61,12 @@ swift build
 - 🏷️ Selectable Dublin Core fields with editable values before writing
 - 🧼 Clears old embedded PDF metadata and xattrs before writing new values
 - 📝 Standard rename rule: `title_author_publisher_year_language.pdf`
-- 🎨 Appearance modes: `System / Daylight / Moonlight`
+- 🎨 Appearance modes: `Daylight / Moonlight`
 - 🗣️ Multi-language UI support
 
 ### 🚀 Install from GitHub Releases
 1. Open the [Releases page](https://github.com/LarryHu1988/Metadata/releases)
-2. Download `PDFLibrarian-1.0.1.dmg` (recommended) or `PDFLibrarian-1.0.1.zip`
+2. Download `PDFLibrarian-1.0.2.dmg` (recommended) or `PDFLibrarian-1.0.2.zip`
 3. For DMG: open it and drag `PDF Librarian.app` to `Applications`
 4. For ZIP: unzip and drag the app into `Applications`
 

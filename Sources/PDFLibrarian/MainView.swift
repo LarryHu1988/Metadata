@@ -3,7 +3,6 @@ import AppKit
 import Foundation
 
 enum AppAppearanceMode: String, CaseIterable, Identifiable {
-    case system
     case light
     case dark
 
@@ -11,8 +10,6 @@ enum AppAppearanceMode: String, CaseIterable, Identifiable {
 
     var iconName: String {
         switch self {
-        case .system:
-            return "circle.lefthalf.filled"
         case .light:
             return "sun.max"
         case .dark:
@@ -22,8 +19,6 @@ enum AppAppearanceMode: String, CaseIterable, Identifiable {
 
     var textKey: AppTextKey {
         switch self {
-        case .system:
-            return .appearanceSystem
         case .light:
             return .appearanceLightDay
         case .dark:
@@ -31,10 +26,8 @@ enum AppAppearanceMode: String, CaseIterable, Identifiable {
         }
     }
 
-    var preferredColorScheme: ColorScheme? {
+    var preferredColorScheme: ColorScheme {
         switch self {
-        case .system:
-            return nil
         case .light:
             return .light
         case .dark:
@@ -72,11 +65,11 @@ private struct SurgePalette {
 
     static let light = SurgePalette(
         isDark: false,
-        canvasTop: Color(red: 0.94, green: 0.97, blue: 1.0),
-        canvasBottom: Color(red: 0.88, green: 0.93, blue: 0.98),
-        flowA: Color(red: 0.34, green: 0.62, blue: 0.88),
-        flowB: Color(red: 0.24, green: 0.54, blue: 0.83),
-        flowC: Color(red: 0.57, green: 0.76, blue: 0.91),
+        canvasTop: Color(red: 0.90, green: 0.93, blue: 0.96),
+        canvasBottom: Color(red: 0.84, green: 0.89, blue: 0.94),
+        flowA: Color(red: 0.27, green: 0.48, blue: 0.70),
+        flowB: Color(red: 0.20, green: 0.42, blue: 0.64),
+        flowC: Color(red: 0.43, green: 0.60, blue: 0.78),
         textPrimary: Color.black.opacity(0.85),
         textSecondary: Color.black.opacity(0.60),
         cardStroke: Color.black.opacity(0.14),
@@ -114,10 +107,9 @@ private extension EnvironmentValues {
 
 struct MainView: View {
     @StateObject private var viewModel = MainViewModel()
-    @StateObject private var systemAppearanceObserver = SystemAppearanceObserver()
 
     private var resolvedColorScheme: ColorScheme {
-        viewModel.preferredColorScheme ?? systemAppearanceObserver.colorScheme
+        viewModel.preferredColorScheme
     }
 
     private var palette: SurgePalette {
@@ -155,10 +147,6 @@ struct MainView: View {
         }
         .preferredColorScheme(viewModel.preferredColorScheme)
         .environment(\.surgePalette, palette)
-        .onChange(of: viewModel.appearanceMode) { mode in
-            guard mode == .system else { return }
-            systemAppearanceObserver.refreshNow()
-        }
     }
 
     private func text(_ key: AppTextKey) -> String {
@@ -182,7 +170,7 @@ struct MainView: View {
             .ignoresSafeArea()
 
             RadialGradient(
-                colors: [palette.flowA.opacity(palette.isDark ? 0.55 : 0.30), .clear],
+                colors: [palette.flowA.opacity(palette.isDark ? 0.55 : 0.20), .clear],
                 center: .topTrailing,
                 startRadius: 20,
                 endRadius: 680
@@ -190,7 +178,7 @@ struct MainView: View {
             .ignoresSafeArea()
 
             RadialGradient(
-                colors: [palette.flowB.opacity(palette.isDark ? 0.42 : 0.24), .clear],
+                colors: [palette.flowB.opacity(palette.isDark ? 0.42 : 0.16), .clear],
                 center: .bottomLeading,
                 startRadius: 40,
                 endRadius: 720
@@ -201,8 +189,8 @@ struct MainView: View {
                 .fill(
                     LinearGradient(
                         colors: [
-                            palette.flowA.opacity(palette.isDark ? 0.42 : 0.24),
-                            palette.flowC.opacity(palette.isDark ? 0.18 : 0.12)
+                            palette.flowA.opacity(palette.isDark ? 0.42 : 0.17),
+                            palette.flowC.opacity(palette.isDark ? 0.18 : 0.08)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -216,8 +204,8 @@ struct MainView: View {
                 .fill(
                     LinearGradient(
                         colors: [
-                            palette.flowB.opacity(palette.isDark ? 0.38 : 0.22),
-                            palette.flowC.opacity(palette.isDark ? 0.14 : 0.10)
+                            palette.flowB.opacity(palette.isDark ? 0.38 : 0.15),
+                            palette.flowC.opacity(palette.isDark ? 0.14 : 0.07)
                         ],
                         startPoint: .topTrailing,
                         endPoint: .bottomLeading
@@ -666,35 +654,6 @@ struct MainView: View {
                 }
             }
         }
-    }
-}
-
-@MainActor
-private final class SystemAppearanceObserver: ObservableObject {
-    @Published private(set) var colorScheme: ColorScheme = .light
-    private var observation: NSKeyValueObservation?
-
-    init() {
-        observeAppearance()
-    }
-
-    func refreshNow() {
-        updateColorScheme(for: NSApplication.shared.effectiveAppearance)
-    }
-
-    private func observeAppearance() {
-        observation = NSApplication.shared.observe(\.effectiveAppearance, options: [.initial, .new]) { [weak self] application, _ in
-            Task { @MainActor [weak self] in
-                self?.updateColorScheme(for: application.effectiveAppearance)
-            }
-        }
-    }
-
-    private func updateColorScheme(for appearance: NSAppearance) {
-        let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-        let next: ColorScheme = isDark ? .dark : .light
-        guard colorScheme != next else { return }
-        colorScheme = next
     }
 }
 
@@ -1169,7 +1128,7 @@ final class MainViewModel: ObservableObject {
         let storedCode = UserDefaults.standard.string(forKey: Self.languageDefaultsKey)
         let initialLanguage = AppLanguage.from(code: storedCode) ?? AppLanguage.systemPreferred
         let storedAppearance = UserDefaults.standard.string(forKey: Self.appearanceDefaultsKey)
-        let initialAppearance = AppAppearanceMode(rawValue: storedAppearance ?? "") ?? .system
+        let initialAppearance = AppAppearanceMode(rawValue: storedAppearance ?? "") ?? .light
         self.language = initialLanguage
         self.appearanceMode = initialAppearance
         AppLocalization.currentLanguage = initialLanguage
@@ -1208,7 +1167,7 @@ final class MainViewModel: ObservableObject {
         text(mode.textKey)
     }
 
-    var preferredColorScheme: ColorScheme? {
+    var preferredColorScheme: ColorScheme {
         appearanceMode.preferredColorScheme
     }
 
