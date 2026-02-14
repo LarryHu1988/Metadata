@@ -16,7 +16,7 @@ A desktop app for managing metadata of book/paper PDFs.
 
 ### 🚀 下载安装（GitHub Release）
 1. 打开 [Releases 页面](https://github.com/LarryHu1988/Metadata/releases)
-2. 下载 `PDFLibrarian-1.0.0.dmg`（推荐）或 `PDFLibrarian-1.0.0.zip`
+2. 下载 `PDFLibrarian-1.0.1.dmg`（推荐）或 `PDFLibrarian-1.0.1.zip`
 3. 若是 DMG：打开后将 `PDF Librarian.app` 拖到 `Applications`，即安装完成
 4. 若是 ZIP：解压后将 `.app` 拖到 `Applications`
 
@@ -66,7 +66,7 @@ swift build
 
 ### 🚀 Install from GitHub Releases
 1. Open the [Releases page](https://github.com/LarryHu1988/Metadata/releases)
-2. Download `PDFLibrarian-1.0.0.dmg` (recommended) or `PDFLibrarian-1.0.0.zip`
+2. Download `PDFLibrarian-1.0.1.dmg` (recommended) or `PDFLibrarian-1.0.1.zip`
 3. For DMG: open it and drag `PDF Librarian.app` to `Applications`
 4. For ZIP: unzip and drag the app into `Applications`
 

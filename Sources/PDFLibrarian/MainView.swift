@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import Foundation
 
 enum AppAppearanceMode: String, CaseIterable, Identifiable {
     case system
@@ -113,10 +114,10 @@ private extension EnvironmentValues {
 
 struct MainView: View {
     @StateObject private var viewModel = MainViewModel()
-    @Environment(\.colorScheme) private var systemColorScheme
+    @StateObject private var systemAppearanceObserver = SystemAppearanceObserver()
 
     private var resolvedColorScheme: ColorScheme {
-        viewModel.preferredColorScheme ?? systemColorScheme
+        viewModel.preferredColorScheme ?? systemAppearanceObserver.colorScheme
     }
 
     private var palette: SurgePalette {
@@ -154,6 +155,10 @@ struct MainView: View {
         }
         .preferredColorScheme(viewModel.preferredColorScheme)
         .environment(\.surgePalette, palette)
+        .onChange(of: viewModel.appearanceMode) { mode in
+            guard mode == .system else { return }
+            systemAppearanceObserver.refreshNow()
+        }
     }
 
     private func text(_ key: AppTextKey) -> String {
@@ -661,6 +666,35 @@ struct MainView: View {
                 }
             }
         }
+    }
+}
+
+@MainActor
+private final class SystemAppearanceObserver: ObservableObject {
+    @Published private(set) var colorScheme: ColorScheme = .light
+    private var observation: NSKeyValueObservation?
+
+    init() {
+        observeAppearance()
+    }
+
+    func refreshNow() {
+        updateColorScheme(for: NSApplication.shared.effectiveAppearance)
+    }
+
+    private func observeAppearance() {
+        observation = NSApplication.shared.observe(\.effectiveAppearance, options: [.initial, .new]) { [weak self] application, _ in
+            Task { @MainActor [weak self] in
+                self?.updateColorScheme(for: application.effectiveAppearance)
+            }
+        }
+    }
+
+    private func updateColorScheme(for appearance: NSAppearance) {
+        let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        let next: ColorScheme = isDark ? .dark : .light
+        guard colorScheme != next else { return }
+        colorScheme = next
     }
 }
 
