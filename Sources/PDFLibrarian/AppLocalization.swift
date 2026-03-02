@@ -142,6 +142,8 @@ enum AppTextKey {
     case editableHint
     case cardFourTitle
     case suggestedFileName
+    case renameFileNameLabel
+    case renameFileNamePlaceholder
     case renameRule
     case renameRuleNote
     case buttonRename
@@ -345,12 +347,16 @@ enum AppLocalization {
             return "4) Ask and Rename"
         case .suggestedFileName:
             return "Suggested name: %@"
+        case .renameFileNameLabel:
+            return "File name to apply (editable)"
+        case .renameFileNamePlaceholder:
+            return "Edit final file name"
         case .renameRule:
             return "Rule: title_author_publisher_year_language.pdf"
         case .renameRuleNote:
-            return "Spaces inside each field are replaced with '.', while fields remain separated by '_'."
+            return "Naming is generated from the latest written metadata; final rename uses the edited file name above."
         case .buttonRename:
-            return "Rename with Standard Rule"
+            return "Confirm and Rename"
         case .buttonSkipRename:
             return "Skip Rename"
         case .noRenamePrompt:
@@ -562,12 +568,16 @@ enum AppLocalization {
             return "4) 询问并重命名"
         case .suggestedFileName:
             return "建议命名：%@"
+        case .renameFileNameLabel:
+            return "最终文件名（可编辑）"
+        case .renameFileNamePlaceholder:
+            return "可手动修改后再确认重命名"
         case .renameRule:
             return "规则：书名_作者_出版社_出版年_语言.pdf"
         case .renameRuleNote:
-            return "字段内空格会替换为 .，字段之间仍使用 _ 分隔。"
+            return "命名将基于最新写入元数据生成；确认时会按上方编辑后的文件名执行重命名。"
         case .buttonRename:
-            return "按标准规则重命名"
+            return "确认并重命名"
         case .buttonSkipRename:
             return "暂不重命名"
         case .noRenamePrompt:

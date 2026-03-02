@@ -600,6 +600,32 @@ struct MainView: View {
                     Text(format(.suggestedFileName, prompt.suggestedFileName))
                         .font(.custom("Songti SC", size: 14).weight(.semibold))
 
+                    Text(text(.renameFileNameLabel))
+                        .font(.custom("Songti SC", size: 13).weight(.semibold))
+                        .foregroundStyle(palette.textPrimary)
+
+                    TextField(
+                        text(.renameFileNamePlaceholder),
+                        text: Binding(
+                            get: { viewModel.renamePromptFileName },
+                            set: { viewModel.updateRenamePromptFileName($0) }
+                        )
+                    )
+                    .textFieldStyle(.plain)
+                    .lineLimit(1)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .font(.custom("Menlo", size: 12))
+                    .foregroundStyle(palette.textPrimary)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .fill(palette.surface(0.08, 0.62))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(palette.stroke(0.18, 0.14), lineWidth: 1)
+                    )
+
                     Text(text(.renameRule))
                         .font(.custom("Songti SC", size: 13))
                         .foregroundStyle(palette.textSecondary)
@@ -1084,6 +1110,7 @@ enum DublinCoreField: String, CaseIterable, Hashable {
 struct RenamePromptState {
     let itemID: UUID
     let suggestedFileName: String
+    var editableFileName: String
 }
 
 @MainActor
@@ -1109,6 +1136,7 @@ final class MainViewModel: ObservableObject {
     @Published var pendingWriteSummary: String = ""
 
     private var pendingWriteItemID: UUID?
+    private var pendingWriteEntries: [String: String] = [:]
     @Published var renamePrompt: RenamePromptState?
 
     private struct EditableValuesContext: Hashable {
@@ -1194,6 +1222,10 @@ final class MainViewModel: ObservableObject {
         case .written, .renamed, .renameSkipped:
             return 4
         }
+    }
+
+    var renamePromptFileName: String {
+        renamePrompt?.editableFileName ?? ""
     }
 
     func pickSource() {
@@ -1325,6 +1357,12 @@ final class MainViewModel: ObservableObject {
         editableValuesCache[context] = editableDublinCoreValues
     }
 
+    func updateRenamePromptFileName(_ value: String) {
+        guard var prompt = renamePrompt else { return }
+        prompt.editableFileName = value
+        renamePrompt = prompt
+    }
+
     func askWriteConfirmationForSelectedItem() {
         guard let item = selectedItem,
               let candidate = selectedCandidate(for: item)
@@ -1346,19 +1384,20 @@ final class MainViewModel: ObservableObject {
             .joined(separator: "\n")
 
         pendingWriteItemID = item.id
+        pendingWriteEntries = entries
         pendingWriteSummary = format(.statusWritePreview, arguments: [preview])
         showWriteConfirmation = true
     }
 
     func cancelWriteConfirmation() {
         pendingWriteItemID = nil
+        pendingWriteEntries = [:]
         pendingWriteSummary = ""
     }
 
     func performWriteConfirmed() {
         guard let itemID = pendingWriteItemID,
-              let index = items.firstIndex(where: { $0.id == itemID }),
-              let candidate = selectedCandidate(for: items[index])
+              let index = items.firstIndex(where: { $0.id == itemID })
         else {
             status = text(.statusWriteFailedMissingItem)
             appendLog(status)
@@ -1367,13 +1406,12 @@ final class MainViewModel: ObservableObject {
 
         let url = items[index].url
 
-        guard !selectedDublinCoreFields.isEmpty else {
+        let entries = pendingWriteEntries
+        guard !entries.isEmpty else {
             status = text(.statusWriteFailedNoFields)
             appendLog(status)
             return
         }
-
-        let entries = dublinCoreEntries(for: items[index], candidate: candidate)
 
         do {
             try metadataService.writeMetadata(fileURL: url, entries: entries)
@@ -1381,8 +1419,8 @@ final class MainViewModel: ObservableObject {
             status = format(.statusWriteSuccess, arguments: [url.lastPathComponent])
             appendLog(status)
 
-            let suggested = renameService.suggestedFileName(for: candidate, originalExtension: url.pathExtension)
-            renamePrompt = RenamePromptState(itemID: itemID, suggestedFileName: suggested)
+            let suggested = renameService.suggestedFileName(forDublinCore: entries, originalExtension: url.pathExtension)
+            renamePrompt = RenamePromptState(itemID: itemID, suggestedFileName: suggested, editableFileName: suggested)
         } catch {
             items[index].stage = .failed
             items[index].lastError = error.localizedDescription
@@ -1391,13 +1429,13 @@ final class MainViewModel: ObservableObject {
         }
 
         pendingWriteItemID = nil
+        pendingWriteEntries = [:]
         pendingWriteSummary = ""
     }
 
     func confirmRenameForPrompt() {
         guard let prompt = renamePrompt,
-              let index = items.firstIndex(where: { $0.id == prompt.itemID }),
-              let candidate = selectedCandidate(for: items[index])
+              let index = items.firstIndex(where: { $0.id == prompt.itemID })
         else {
             status = text(.statusRenameMissingContext)
             appendLog(status)
@@ -1405,9 +1443,12 @@ final class MainViewModel: ObservableObject {
         }
 
         let oldURL = items[index].url
+        let preferredName = prompt.editableFileName
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .isEmpty ? prompt.suggestedFileName : prompt.editableFileName
 
         do {
-            let newURL = try renameService.renameFile(at: oldURL, using: candidate)
+            let newURL = try renameService.renameFile(at: oldURL, to: preferredName)
             items[index].url = newURL
             items[index].stage = .renamed
             status = format(.statusRenameSuccess, arguments: [oldURL.lastPathComponent, newURL.lastPathComponent])
@@ -1530,13 +1571,21 @@ final class MainViewModel: ObservableObject {
     }
 
     private func dublinCoreEntries(for item: PDFWorkItem, candidate: BookMetadataCandidate) -> [String: String] {
-        let all = editableValuesMap(for: item, candidate: candidate)
+        let all = currentEditableValues(for: item, candidate: candidate)
 
         var entries: [String: String] = [:]
         for field in DublinCoreField.allCases where selectedDublinCoreFields.contains(field) {
             entries[field.rawValue] = all[field] ?? ""
         }
         return entries
+    }
+
+    private func currentEditableValues(for item: PDFWorkItem, candidate: BookMetadataCandidate) -> [DublinCoreField: String] {
+        let context = EditableValuesContext(itemID: item.id, candidateID: candidate.id)
+        if context == editableValuesContext {
+            return editableDublinCoreValues
+        }
+        return editableValuesMap(for: item, candidate: candidate)
     }
 
     private func appendLog(_ line: String) {
