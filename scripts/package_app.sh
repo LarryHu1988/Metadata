@@ -5,11 +5,14 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 APP_DISPLAY_NAME="PDF Librarian"
 APP_EXECUTABLE="PDFLibrarian"
 BUNDLE_ID="${BUNDLE_ID:-com.larry.pdflibrarian}"
-VERSION="${VERSION:-1.0.3}"
+VERSION="${VERSION:-1.0.0}"
 BUILD_DIR="$ROOT_DIR/.build/release"
 APP_DIR="$ROOT_DIR/dist/${APP_DISPLAY_NAME}.app"
 EXECUTABLE="$BUILD_DIR/$APP_EXECUTABLE"
 EXIFTOOL_DIR="${EXIFTOOL_DIR:-}"
+ICON_ICNS_SOURCE="$ROOT_DIR/Sources/PDFLibrarian/Resources/AppIcon.icns"
+ICON_RESOURCE_NAME="AppIcon.icns"
+ICON_PLIST_BLOCK=""
 
 resolve_exiftool_dir() {
   if [[ -n "$EXIFTOOL_DIR" && -x "$EXIFTOOL_DIR/bin/exiftool" && -d "$EXIFTOOL_DIR/lib" ]]; then
@@ -49,6 +52,14 @@ mkdir -p "$APP_DIR/Contents/Resources"
 cp "$EXECUTABLE" "$APP_DIR/Contents/MacOS/$APP_EXECUTABLE"
 chmod +x "$APP_DIR/Contents/MacOS/$APP_EXECUTABLE"
 
+if [[ -f "$ICON_ICNS_SOURCE" ]]; then
+  cp "$ICON_ICNS_SOURCE" "$APP_DIR/Contents/Resources/$ICON_RESOURCE_NAME"
+  ICON_PLIST_BLOCK=$'    <key>CFBundleIconFile</key>\n    <string>AppIcon</string>'
+else
+  echo "WARNING: App icon not found at $ICON_ICNS_SOURCE"
+  echo "Run scripts/generate_app_icons.sh to generate AppIcon.icns"
+fi
+
 if EXIFTOOL_SRC="$(resolve_exiftool_dir)"; then
   mkdir -p "$APP_DIR/Contents/Resources/ExifTool"
   cp -R "$EXIFTOOL_SRC/bin" "$APP_DIR/Contents/Resources/ExifTool/"
@@ -81,8 +92,13 @@ cat > "$APP_DIR/Contents/Info.plist" <<PLIST
     <string>APPL</string>
     <key>CFBundleExecutable</key>
     <string>$APP_EXECUTABLE</string>
+${ICON_PLIST_BLOCK}
     <key>LSMinimumSystemVersion</key>
     <string>13.0</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.productivity</string>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>

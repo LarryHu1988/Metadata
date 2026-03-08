@@ -12,19 +12,24 @@ targets:
     platform: macOS
     sources:
       - Sources/PDFLibrarian
+    resources:
+      - Sources/PDFLibrarian/Assets.xcassets
     settings:
       base:
         PRODUCT_NAME: "PDF Librarian"
         INFOPLIST_KEY_CFBundleDisplayName: "PDF Librarian"
         INFOPLIST_KEY_LSMinimumSystemVersion: "13.0"
         CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: Sources/PDFLibrarian/PDFLibrarian.entitlements
     info:
       path: Sources/PDFLibrarian/Info.plist
       properties:
         CFBundleName: "PDF Librarian"
         CFBundleDisplayName: "PDF Librarian"
-        CFBundleShortVersionString: 1.0.3
-        CFBundleVersion: 1.0.3
+        CFBundleShortVersionString: 1.0.0
+        CFBundleVersion: 1.0.0
+        LSApplicationCategoryType: public.app-category.productivity
+        ITSAppUsesNonExemptEncryption: false
         NSHighResolutionCapable: true
         NSPrincipalClass: NSApplication
 schemes:

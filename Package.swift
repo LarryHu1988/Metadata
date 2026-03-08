@@ -13,7 +13,12 @@ let package = Package(
         .executableTarget(
             name: "PDFLibrarian",
             path: "Sources/PDFLibrarian",
-            exclude: ["Info.plist"]
+            exclude: [
+                "Info.plist",
+                "Assets.xcassets",
+                "Resources",
+                "PDFLibrarian.entitlements"
+            ]
         )
     ]
 )

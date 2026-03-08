@@ -4,11 +4,14 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 APP_DISPLAY_NAME="PDF Librarian"
 APP_SLUG="PDFLibrarian"
-VERSION="${VERSION:-1.0.3}"
+VERSION="${VERSION:-1.0.0}"
 APP_PATH="$ROOT_DIR/dist/${APP_DISPLAY_NAME}.app"
 ZIP_PATH="$ROOT_DIR/dist/${APP_SLUG}-${VERSION}.zip"
 DMG_PATH="$ROOT_DIR/dist/${APP_SLUG}-${VERSION}.dmg"
 DMG_STAGE_DIR="$ROOT_DIR/dist/.dmg-stage-${VERSION}"
+
+# Ensure icon assets stay in sync for local package/release artifacts.
+"$ROOT_DIR/scripts/generate_app_icons.sh"
 
 # Always rebuild the app before creating release assets to avoid packaging
 # a stale .app that may remain in dist from previous versions.
