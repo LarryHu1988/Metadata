@@ -168,10 +168,7 @@ struct MetadataService {
         case "dc:date":
             return ["-XMP-dc:Date=\(cleanValue)"]
         case "dc:language":
-            return [
-                "-XMP-dc:Language=\(cleanValue)",
-                "-PDF:Lang=\(cleanValue)"
-            ]
+            return ["-XMP-dc:Language=\(cleanValue)"]
         case "dc:type":
             return ["-XMP-dc:Type=\(cleanValue)"]
         case "dc:format":

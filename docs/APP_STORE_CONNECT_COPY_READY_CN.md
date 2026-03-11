@@ -279,6 +279,7 @@ Important notes for review:
 - `/Users/larry/Documents/PDF Librarian/docs/app-store/screenshots/en-US/02.png`
 - `/Users/larry/Documents/PDF Librarian/docs/app-store/screenshots/en-US/03.png`
 - `/Users/larry/Documents/PDF Librarian/docs/app-store/screenshots/en-US/04.png`
+- `/Users/larry/Documents/PDF Librarian/docs/app-store/screenshots/en-US/05.png`
 
 ### 简体中文
 
@@ -286,6 +287,15 @@ Important notes for review:
 - `/Users/larry/Documents/PDF Librarian/docs/app-store/screenshots/zh-Hans/02.png`
 - `/Users/larry/Documents/PDF Librarian/docs/app-store/screenshots/zh-Hans/03.png`
 - `/Users/larry/Documents/PDF Librarian/docs/app-store/screenshots/zh-Hans/04.png`
+- `/Users/larry/Documents/PDF Librarian/docs/app-store/screenshots/zh-Hans/05.png`
+
+推荐上传顺序：
+
+1. `01.png`：从文件名和 PDF 线索开始检索
+2. `02.png`：对比并合并多来源候选结果
+3. `03.png`：写入前确认并编辑 Dublin Core 字段
+4. `04.png`：基于最新元数据进行重命名
+5. `05.png`：展示中英双语与日光/月光模式
 
 ## 九、宣传预览图
 
