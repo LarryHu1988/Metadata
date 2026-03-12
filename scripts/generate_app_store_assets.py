@@ -13,32 +13,33 @@ PREVIEW_OUT = OUT / 'preview'
 W, H = 2880, 1800
 PW, PH = 1920, 1080
 
-EN_TITLE_FONT = '/System/Library/Fonts/Avenir Next.ttc'
-EN_BODY_FONT = '/System/Library/Fonts/SFNS.ttf'
-CN_TITLE_FONT = '/System/Library/Fonts/STHeiti Medium.ttc'
+EN_TITLE_FONT = '/System/Library/Fonts/NewYork.ttf'
+EN_BODY_FONT = '/Library/Fonts/SF-Pro.ttf'
+CN_TITLE_FONT = '/System/Library/Fonts/Supplemental/Songti.ttc'
 CN_BODY_FONT = '/System/Library/Fonts/Hiragino Sans GB.ttc'
 MONO_FONT = '/System/Library/Fonts/SFNSMono.ttf'
 FALLBACK_FONT = '/System/Library/Fonts/Supplemental/Arial Unicode.ttf'
+BRAND_FONT = '/System/Library/Fonts/Avenir Next.ttc'
 LOGO = ASSETS / 'PDFLibrarian-logo-1024.png'
 
 SLIDES = {
     'en-US': [
         {
             'eyebrow': 'PRECISE LOOKUP',
-            'title': 'Search from file names\nand PDF hints',
-            'subtitle': 'Load a folder of PDFs, extract filename clues, and prepare a focused search in one place.',
+            'title': 'Search from filenames\nand PDF clues',
+            'subtitle': 'Load a PDF folder, extract title, ISBN, and DOI hints, and start with a focused shortlist.',
             'points': [
                 'Scan folders recursively',
                 'Read title, ISBN, and DOI hints',
                 'Start from a clean shortlist',
             ],
-            'image': ASSETS / 'pdflibrarian-en-light-full.png',
+            'image': RAW / 'en-top-light-actual.png',
             'theme': 'light',
         },
         {
             'eyebrow': 'COMPARE SOURCES',
-            'title': 'Compare ranked public\nmetadata candidates',
-            'subtitle': 'Review merged results from multiple sources before choosing the record that should drive the write.',
+            'title': 'Compare ranked public\nmetadata results',
+            'subtitle': 'Review merged candidates from multiple sources before choosing the record that should drive the write.',
             'points': [
                 'Merged ranking across sources',
                 'Confidence and validation chips',
@@ -49,59 +50,59 @@ SLIDES = {
         },
         {
             'eyebrow': 'EDIT BEFORE WRITE',
-            'title': 'Review and edit\nDublin Core fields',
+            'title': 'Review and edit\nmetadata fields',
             'subtitle': 'Check every field before metadata is written back to the selected PDF.',
             'points': [
                 'Editable values in place',
                 'Selectable field set',
                 'Predictable write result',
             ],
-            'image': RAW / 'en-edit-dark.png',
+            'image': RAW / 'en-edit-dark-actual.png',
             'theme': 'dark',
         },
         {
             'eyebrow': 'RENAME CLEANLY',
             'title': 'Rename from the latest\nwritten metadata',
-            'subtitle': 'Generate a consistent file name from the latest write and still allow a final manual edit.',
+            'subtitle': 'Use the latest write as the naming source, then keep one final manual edit before rename.',
             'points': [
                 'Suggestion from fresh metadata',
                 'Final filename stays editable',
                 'Cleaner library naming',
             ],
-            'image': RAW / 'en-edit-dark.png',
+            'image': RAW / 'en-rename-dark-actual.png',
             'theme': 'dark',
-            'mock': 'rename',
+            'detail_crop_box': (42, 892, 1935, 1508),
         },
         {
             'eyebrow': 'DAYLIGHT + MOONLIGHT',
-            'title': 'Work in English or Chinese\nwith refined light and dark modes',
+            'title': 'Work in English or Chinese\nwith light and dark modes',
             'subtitle': 'A desktop workflow built for long cleanup sessions across bright and dark environments.',
             'points': [
                 'English and Chinese UI',
                 'Daylight and Moonlight modes',
                 'Polished for daily library work',
             ],
-            'image': RAW / 'en-top-dark.png',
+            'image': RAW / 'en-top-dark-actual.png',
             'theme': 'dark',
         },
     ],
     'zh-Hans': [
         {
             'eyebrow': '精准检索',
-            'title': '文件名与 PDF 线索\n驱动精准检索',
-            'subtitle': '加载 PDF 后统一提取标题、ISBN 与 DOI 线索并开始联机检索。',
+            'title': '文件名与线索\n驱动精准检索',
+            'subtitle': '加载 PDF 后统一提取标题、ISBN 与 DOI 线索，再开始联机检索。',
             'points': [
                 '递归扫描文件夹中的 PDF',
                 '自动提取标题与编号线索',
                 '从干净候选集开始筛选',
             ],
-            'image': ASSETS / 'pdflibrarian-zh-Hans-light-full.png',
+            'image': RAW / 'zh-top-light-actual.png',
             'theme': 'light',
         },
         {
             'eyebrow': '候选对比',
-            'title': '对比并合并\n候选元数据结果',
-            'subtitle': '先看多来源候选及置信度，再决定哪条记录进入写入流程。',
+            'title': '对比多来源\n候选元数据',
+            'subtitle': '先看候选结果与置信度，再决定哪条记录进入写入流程。',
             'points': [
                 '跨来源合并与排序',
                 '带置信度与来源标记',
@@ -112,39 +113,39 @@ SLIDES = {
         },
         {
             'eyebrow': '写入前确认',
-            'title': '写入前确认并编辑\nDublin Core 字段',
+            'title': '写入前确认并\n编辑元数据字段',
             'subtitle': '逐项查看并修改字段内容，确保写回 PDF 的就是最终确认值。',
             'points': [
                 '字段可逐项编辑',
                 '仅写入最终确认值',
                 '写入结果更可预期',
             ],
-            'image': RAW / 'zh-edit-dark.png',
+            'image': RAW / 'zh-edit-dark-actual.png',
             'theme': 'dark',
         },
         {
             'eyebrow': '标准命名',
-            'title': '基于最新元数据\n完成标准重命名',
+            'title': '基于最新元数据\n统一文件命名',
             'subtitle': '按刚写入的元数据生成建议文件名，并保留最后一次手动修改。',
             'points': [
                 '建议名来自最新元数据',
                 '最终文件名仍可改',
                 '统一资料库命名规则',
             ],
-            'image': RAW / 'zh-edit-dark.png',
+            'image': RAW / 'zh-rename-dark-actual.png',
             'theme': 'dark',
-            'mock': 'rename',
+            'detail_crop_box': (42, 892, 1935, 1508),
         },
         {
             'eyebrow': '双语与双模式',
-            'title': '支持中英双语与\n日光、月光工作模式',
+            'title': '支持中英双语与\n日光、月光模式',
             'subtitle': '适合长时间整理图书和文献 PDF，同时兼顾亮色与暗色桌面环境。',
             'points': [
                 '中英文界面',
                 '日光与月光模式',
                 '适合书籍、论文与参考资料',
             ],
-            'image': RAW / 'zh-top-dark.png',
+            'image': RAW / 'zh-top-dark-actual.png',
             'theme': 'dark',
         },
     ],
@@ -153,14 +154,14 @@ SLIDES = {
 PREVIEWS = {
     'en-US': {
         'eyebrow': 'PDF LIBRARIAN',
-        'title': 'Clean PDF metadata\nand rename with context',
+        'title': 'Clean metadata\nand rename with context',
         'subtitle': 'Search, confirm, write, and rename in one calmer desktop workflow.',
         'points': ['Multi-source lookup', 'Editable Dublin Core write'],
     },
     'zh-Hans': {
         'eyebrow': 'PDF LIBRARIAN',
-        'title': '整理 PDF 元数据\n并标准重命名',
-        'subtitle': '完成检索、确认、写入与重命名，让资料库更整洁。',
+        'title': '整理元数据\n并统一命名',
+        'subtitle': '完成检索、确认、写入与重命名，让资料库更整洁',
         'points': ['多源检索', '可编辑写入'],
     },
 }
@@ -266,85 +267,16 @@ def trim_window_frame(img: Image.Image) -> Image.Image:
     return img.crop((max(min_x - pad, 0), max(min_y - pad, 0), min(max_x + pad, img.width), min(max_y + pad, img.height)))
 
 
-def sanitize_shot(img: Image.Image, is_dark: bool) -> Image.Image:
-    shot = trim_window_frame(img).convert('RGBA').copy()
-    d = ImageDraw.Draw(shot)
-    fill = (236, 239, 244, 255) if not is_dark else (73, 87, 120, 255)
-    stroke = (198, 210, 226, 255) if not is_dark else (99, 113, 150, 255)
-    d.rounded_rectangle((86, 780, 228, 840), radius=12, fill=fill, outline=stroke, width=1)
-    return shot
-
-
-def mock_rename_shot(img: Image.Image, locale: str, is_dark: bool) -> Image.Image:
-    shot = sanitize_shot(img, is_dark)
-    draw = ImageDraw.Draw(shot)
-    title_font = font(CN_TITLE_FONT if locale == 'zh-Hans' else EN_TITLE_FONT, 26)
-    body_font = font(CN_BODY_FONT if locale == 'zh-Hans' else EN_BODY_FONT, 16)
-    note_font = font(CN_BODY_FONT if locale == 'zh-Hans' else EN_BODY_FONT, 14)
-    mono_font = font(MONO_FONT, 15)
-
-    panel = (24, 474, shot.width - 22, shot.height - 22)
-    fill = (60, 82, 117, 245) if is_dark else (244, 247, 252, 248)
-    stroke = (106, 128, 170, 255) if is_dark else (201, 214, 234, 255)
-    text_fill = (243, 247, 252) if is_dark else (28, 39, 56)
-    sub_fill = (194, 205, 222) if is_dark else (93, 108, 130)
-    accent = (104, 168, 255) if is_dark else (61, 125, 233)
-    field_fill = (71, 90, 124, 255) if is_dark else (230, 236, 246, 255)
-
-    draw.rounded_rectangle(panel, radius=20, fill=fill, outline=stroke, width=2)
-    x1, y1, x2, y2 = panel
-    cursor_y = y1 + 24
-    title = '4) Ask and Rename' if locale == 'en-US' else '4) 询问并重命名'
-    draw.text((x1 + 20, cursor_y), title, font=title_font, fill=text_fill)
-    cursor_y += 40
-
-    suggested_label = 'Suggested file name' if locale == 'en-US' else '建议文件名'
-    file_name = (
-        'Introduction to Distributed Algorithms - Gerard Tel - 2001.pdf'
-        if locale == 'en-US'
-        else 'Introduction to Algorithms, fourth edition - Cormen.pdf'
-    )
-    editable_label = 'Final file name (editable)' if locale == 'en-US' else '最终文件名（可编辑）'
-    helper = (
-        'Rename uses the latest written metadata. You can still adjust the final file name before applying it.'
-        if locale == 'en-US'
-        else '重命名会基于最新写入的元数据，同时保留最后一次手动修改文件名的能力。'
-    )
-    primary = 'Rename' if locale == 'en-US' else '确认重命名'
-    secondary = 'Skip' if locale == 'en-US' else '跳过'
-
-    draw.text((x1 + 20, cursor_y), suggested_label, font=note_font, fill=sub_fill)
-    cursor_y += 22
-    draw.text((x1 + 20, cursor_y), file_name, font=body_font, fill=text_fill)
-    cursor_y += 40
-    draw.text((x1 + 20, cursor_y), editable_label, font=note_font, fill=sub_fill)
-    cursor_y += 24
-    field_h = 40
-    field_rect = (x1 + 20, cursor_y, x2 - 20, cursor_y + field_h)
-    draw.rounded_rectangle(field_rect, radius=10, fill=field_fill, outline=stroke, width=1)
-    draw.text((field_rect[0] + 14, field_rect[1] + field_h / 2), file_name, font=mono_font, fill=text_fill, anchor='lm')
-    cursor_y += field_h + 18
-
-    helper_text = wrap_text(draw, helper, note_font, x2 - x1 - 40, spacing=5)
-    draw.multiline_text((x1 + 20, cursor_y), helper_text, font=note_font, fill=sub_fill, spacing=5)
-    helper_box = draw.multiline_textbbox((x1 + 20, cursor_y), helper_text, font=note_font, spacing=5)
-    cursor_y = helper_box[3] + 18
-
-    btn_h = 38
-    secondary_w = 82 if locale == 'en-US' else 90
-    primary_w = 104 if locale == 'en-US' else 124
-    secondary_rect = (x2 - 20 - secondary_w - primary_w - 14, cursor_y, x2 - 20 - primary_w - 14, cursor_y + btn_h)
-    primary_rect = (x2 - 20 - primary_w, cursor_y, x2 - 20, cursor_y + btn_h)
-    draw.rounded_rectangle(secondary_rect, radius=10, fill=(36, 48, 74, 255) if is_dark else (236, 241, 248, 255), outline=stroke, width=1)
-    draw.rounded_rectangle(primary_rect, radius=10, fill=accent, outline=accent, width=1)
-    draw.text(((secondary_rect[0] + secondary_rect[2]) / 2, (secondary_rect[1] + secondary_rect[3]) / 2), secondary, font=body_font, fill=text_fill, anchor='mm')
-    draw.text(((primary_rect[0] + primary_rect[2]) / 2, (primary_rect[1] + primary_rect[3]) / 2), primary, font=body_font, fill=(255, 255, 255), anchor='mm')
+def prepare_shot(img: Image.Image, crop_box: tuple[int, int, int, int] | None = None) -> Image.Image:
+    shot = trim_window_frame(img).convert('RGBA')
+    if crop_box:
+        shot = shot.crop(crop_box)
     return shot
 
 
 def screenshot_panel(shot: Image.Image, is_dark: bool) -> Image.Image:
     frame_pad = 28
-    shot = sanitize_shot(shot, is_dark)
+    shot = shot.convert('RGBA')
     shot = fit_image(shot, 1460, 1040)
     shot = rounded(shot, 34)
     panel = Image.new('RGBA', (shot.width + frame_pad * 2, shot.height + frame_pad * 2), (0, 0, 0, 0))
@@ -356,50 +288,65 @@ def screenshot_panel(shot: Image.Image, is_dark: bool) -> Image.Image:
     return panel
 
 
+def screenshot_detail_panel(shot: Image.Image, is_dark: bool, max_w: int = 1060, max_h: int = 560) -> Image.Image:
+    shot = fit_image(shot.convert('RGBA'), max_w, max_h)
+    shot = rounded(shot, 30)
+    panel = Image.new('RGBA', (shot.width + 24, shot.height + 24), (0, 0, 0, 0))
+    d = ImageDraw.Draw(panel)
+    fill = (255, 255, 255, 206) if not is_dark else (17, 26, 47, 242)
+    stroke = (202, 217, 238, 255) if not is_dark else (77, 100, 145, 255)
+    d.rounded_rectangle((0, 0, panel.width - 1, panel.height - 1), radius=34, fill=fill, outline=stroke, width=2)
+    panel.alpha_composite(shot, (12, 12))
+    return panel
+
+
 def draw_text_card(canvas: Image.Image, locale: str, cfg: dict, is_dark: bool, preview: bool = False):
     draw = ImageDraw.Draw(canvas)
     if locale == 'zh-Hans':
-        title_font = font(CN_TITLE_FONT, 56 if preview else 88)
-        sub_font = font(CN_BODY_FONT, 27 if preview else 39)
+        title_font = font(CN_TITLE_FONT, 60 if preview else 92)
+        sub_font = font(CN_BODY_FONT, 25 if preview else 38)
         body_font = font(CN_BODY_FONT, 23 if preview else 29)
-        eyebrow_font = font(CN_BODY_FONT, 22 if preview else 24)
+        eyebrow_font = font(CN_BODY_FONT, 20 if preview else 22)
     else:
-        title_font = font(EN_TITLE_FONT, 62 if preview else 96)
-        sub_font = font(EN_BODY_FONT, 27 if preview else 39)
+        title_font = font(EN_TITLE_FONT, 64 if preview else 98)
+        sub_font = font(EN_BODY_FONT, 28 if preview else 39)
         body_font = font(EN_BODY_FONT, 23 if preview else 29)
-        eyebrow_font = font(EN_BODY_FONT, 22 if preview else 24)
-    brand_font = font(EN_TITLE_FONT, 44 if preview else 50)
+        eyebrow_font = font(EN_BODY_FONT, 20 if preview else 22)
+    brand_font = font(BRAND_FONT, 44 if preview else 48)
 
     card_x, card_y = (74, 76) if preview else (112, 96)
     card_w, card_h = (720, 930) if preview else (1010, 1520)
     layer = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)
-    fill = (255, 255, 255, 192) if not is_dark else (11, 19, 40, 184)
-    stroke = (216, 226, 238, 255) if not is_dark else (84, 100, 138, 255)
-    d.rounded_rectangle((card_x, card_y, card_x + card_w, card_y + card_h), radius=44, fill=fill, outline=stroke, width=2)
+    fill = (255, 255, 255, 196) if not is_dark else (9, 18, 39, 188)
+    stroke = (222, 231, 241, 255) if not is_dark else (72, 93, 134, 255)
+    d.rounded_rectangle((card_x, card_y, card_x + card_w, card_y + card_h), radius=48, fill=fill, outline=stroke, width=2)
+    d.line((card_x + 50, card_y + 214, card_x + card_w - 50, card_y + 214),
+           fill=(228, 233, 242, 255) if not is_dark else (42, 59, 94, 255), width=2)
     canvas.alpha_composite(layer)
 
     logo = Image.open(LOGO).convert('RGBA').resize((94 if preview else 102, 94 if preview else 102), Image.Resampling.LANCZOS)
     canvas.alpha_composite(logo, (card_x + 50, card_y + 48))
-    text_fill = (27, 36, 51) if not is_dark else (244, 247, 252)
-    sub_fill = (82, 95, 116) if not is_dark else (195, 207, 226)
-    accent = (74, 113, 202) if not is_dark else (118, 167, 255)
+    text_fill = (24, 34, 51) if not is_dark else (244, 247, 252)
+    sub_fill = (88, 100, 120) if not is_dark else (196, 208, 228)
+    accent = (72, 110, 210) if not is_dark else (112, 166, 255)
 
     draw.text((card_x + 176, card_y + 60), 'PDF Librarian', font=brand_font, fill=text_fill)
-    chip(draw, (card_x + 50, card_y + 170), cfg['eyebrow'], eyebrow_font,
+    chip(draw, (card_x + 50, card_y + 158), cfg['eyebrow'], eyebrow_font,
          fill=(231, 238, 251, 255) if not is_dark else (34, 52, 88, 255),
          stroke=(196, 213, 239, 255) if not is_dark else (78, 104, 152, 255),
          text_fill=accent)
 
-    title_text = wrap_text(draw, cfg['title'], title_font, 820 if not preview else 560, spacing=10 if locale == 'zh-Hans' else 12)
-    title_y = card_y + (256 if not preview else 228)
-    draw.multiline_text((card_x + 50, title_y), title_text, font=title_font, fill=text_fill, spacing=10 if locale == 'zh-Hans' else 12)
-    title_box = draw.multiline_textbbox((card_x + 50, title_y), title_text, font=title_font, spacing=10 if locale == 'zh-Hans' else 12)
+    title_spacing = 14 if locale == 'zh-Hans' else 12
+    title_text = wrap_text(draw, cfg['title'], title_font, 820 if not preview else 560, spacing=title_spacing)
+    title_y = card_y + (266 if not preview else 236)
+    draw.multiline_text((card_x + 50, title_y), title_text, font=title_font, fill=text_fill, spacing=title_spacing)
+    title_box = draw.multiline_textbbox((card_x + 50, title_y), title_text, font=title_font, spacing=title_spacing)
 
-    sub_text = wrap_text(draw, cfg['subtitle'], sub_font, 840 if not preview else 570, spacing=8)
-    sub_y = title_box[3] + 24
-    draw.multiline_text((card_x + 50, sub_y), sub_text, font=sub_font, fill=sub_fill, spacing=8)
-    sub_box = draw.multiline_textbbox((card_x + 50, sub_y), sub_text, font=sub_font, spacing=8)
+    sub_text = wrap_text(draw, cfg['subtitle'], sub_font, 840 if not preview else 570, spacing=10)
+    sub_y = title_box[3] + 28
+    draw.multiline_text((card_x + 50, sub_y), sub_text, font=sub_font, fill=sub_fill, spacing=10)
+    sub_box = draw.multiline_textbbox((card_x + 50, sub_y), sub_text, font=sub_font, spacing=10)
 
     points_y = sub_box[3] + (54 if not preview else 42)
     step = 78 if not preview else 68
@@ -424,9 +371,7 @@ def draw_text_card(canvas: Image.Image, locale: str, cfg: dict, is_dark: bool, p
 
 def load_slide_image(locale: str, cfg: dict, is_dark: bool) -> Image.Image:
     img = Image.open(cfg['image'])
-    if cfg.get('mock') == 'rename':
-        return mock_rename_shot(img, locale, is_dark)
-    return img
+    return prepare_shot(img, cfg.get('crop_box'))
 
 
 def make_slide(locale: str, idx: int, cfg: dict):
@@ -449,6 +394,9 @@ def make_slide(locale: str, idx: int, cfg: dict):
     panel = screenshot_panel(shot, is_dark)
     shadow = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
     sx, sy = 1230, 286
+    if 'detail_crop_box' in cfg:
+        panel = fit_image(panel, 1120, 880)
+        sx, sy = 1360, 166
     sb = Image.new('RGBA', (panel.width + 84, panel.height + 84), (0, 0, 0, 0))
     sd = ImageDraw.Draw(sb)
     sd.rounded_rectangle((26, 26, panel.width + 28, panel.height + 28), radius=66, fill=(0, 0, 0, 72 if not is_dark else 128))
@@ -456,6 +404,19 @@ def make_slide(locale: str, idx: int, cfg: dict):
     shadow.alpha_composite(sb, (sx - 24, sy + 14))
     canvas.alpha_composite(shadow)
     canvas.alpha_composite(panel, (sx, sy))
+
+    if 'detail_crop_box' in cfg:
+        detail = prepare_shot(Image.open(cfg['image']), cfg['detail_crop_box'])
+        detail_panel = screenshot_detail_panel(detail, True, max_w=1150, max_h=430)
+        dx, dy = 1480, 980
+        sh = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+        box = Image.new('RGBA', (detail_panel.width + 66, detail_panel.height + 66), (0, 0, 0, 0))
+        dd = ImageDraw.Draw(box)
+        dd.rounded_rectangle((20, 20, detail_panel.width + 20, detail_panel.height + 20), radius=54, fill=(0, 0, 0, 118))
+        box = box.filter(ImageFilter.GaussianBlur(18))
+        sh.alpha_composite(box, (dx - 12, dy + 8))
+        canvas.alpha_composite(sh)
+        canvas.alpha_composite(detail_panel, (dx, dy))
 
     out_dir = SCREEN_OUT / locale
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -466,19 +427,19 @@ def make_slide(locale: str, idx: int, cfg: dict):
 
 def make_preview(locale: str):
     cfg = PREVIEWS[locale]
-    bg = gradient((PW, PH), (248, 251, 255), (215, 228, 244))
+    bg = gradient((PW, PH), (249, 251, 255), (214, 228, 246))
     canvas = bg.convert('RGBA')
-    add_glow(canvas, (-120, -80, 640, 420), (90, 139, 248, 82), 128)
-    add_glow(canvas, (1080, 540, 2040, 1240), (22, 164, 255, 72), 160)
+    add_glow(canvas, (-120, -80, 680, 460), (98, 145, 252, 92), 142)
+    add_glow(canvas, (1080, 520, 2040, 1240), (22, 164, 255, 82), 170)
 
     draw_text_card(canvas, locale, cfg, is_dark=False, preview=True)
 
-    light_locale = 'en' if locale == 'en-US' else 'zh-Hans'
-    light = screenshot_panel(Image.open(ASSETS / f'pdflibrarian-{light_locale}-light-full.png'), False)
-    dark_source = RAW / ('en-edit-dark.png' if locale == 'en-US' else 'zh-edit-dark.png')
-    dark = screenshot_panel(mock_rename_shot(Image.open(dark_source), locale, True), True)
-    light = fit_image(light, 900, 590)
-    dark = fit_image(dark, 900, 590)
+    light_source = RAW / ('en-top-light-actual.png' if locale == 'en-US' else 'zh-top-light-actual.png')
+    dark_source = RAW / ('en-rename-dark-actual.png' if locale == 'en-US' else 'zh-rename-dark-actual.png')
+    light = screenshot_panel(prepare_shot(Image.open(light_source)), False)
+    dark = screenshot_detail_panel(prepare_shot(Image.open(dark_source), (42, 892, 1935, 1508)), True, max_w=760, max_h=330)
+    light = fit_image(light, 840, 560)
+    dark = fit_image(dark, 760, 330)
 
     def paste_panel(panel: Image.Image, pos: tuple[int, int], shadow_alpha: int):
         sh = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
@@ -490,8 +451,8 @@ def make_preview(locale: str):
         canvas.alpha_composite(sh)
         canvas.alpha_composite(panel, pos)
 
-    paste_panel(light, (980, 132), 68)
-    paste_panel(dark, (1120, 430), 92)
+    paste_panel(light, (1015, 120), 72)
+    paste_panel(dark, (1130, 585), 98)
 
     out_dir = PREVIEW_OUT
     out_dir.mkdir(parents=True, exist_ok=True)
